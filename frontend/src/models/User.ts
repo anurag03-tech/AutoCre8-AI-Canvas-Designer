@@ -1,0 +1,44 @@
+// models/User.ts
+import mongoose, { Schema, Document } from "mongoose";
+
+export interface IUser extends Document {
+  name: string;
+  email: string;
+  image?: string;
+  provider?: string;
+  providerId?: string;
+  createdAt: Date;
+  updatedAt: Date;
+}
+
+const UserSchema = new Schema<IUser>(
+  {
+    name: {
+      type: String,
+      required: [true, "Name is required"],
+      trim: true,
+    },
+    email: {
+      type: String,
+      required: [true, "Email is required"],
+      unique: true,
+      lowercase: true,
+      trim: true,
+    },
+    image: String,
+
+    provider: {
+      type: String,
+      default: "google",
+    },
+    providerId: String,
+  },
+  {
+    timestamps: true,
+  }
+);
+
+UserSchema.index({ providerId: 1 });
+
+export default mongoose.models.User ||
+  mongoose.model<IUser>("User", UserSchema);
