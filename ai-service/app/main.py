@@ -14,6 +14,8 @@ from app.utils.logger import setup_logger
 from app.services.llm_service import llm_service
 from app.routes.images import router as images_router
 
+FRONTEND_URL = os.getenv("FRONTEND_URL", "http://localhost:3000")
+
 
 logger = setup_logger()
 
@@ -25,7 +27,7 @@ app = FastAPI(
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:3000"],
+    allow_origins=[FRONTEND_URL],  # Uses your .env value
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
