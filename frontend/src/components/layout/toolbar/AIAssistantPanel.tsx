@@ -1,105 +1,161 @@
 // components/layout/toolbar/AIAssistantPanel.tsx
+
 "use client";
 
 import React, { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
+import { Loader2, Sparkles, Wand2 } from "lucide-react";
 import { useCanvas } from "@/contexts/CanvasContext";
-
-interface Message {
-  role: "user" | "assistant";
-  content: string;
-}
+import { useParams } from "next/navigation";
 
 const AIAssistantPanel = () => {
-  const { canvas } = useCanvas();
-  const [messages, setMessages] = useState<Message[]>([]);
-  const [input, setInput] = useState("");
+  const { canvas, canvasActions } = useCanvas();
+  const params = useParams();
+  const canvasId = params?.canvasId as string;
+
+  const [prompt, setPrompt] = useState("");
   const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
-  const sendMessage = async () => {
-    if (!input.trim()) return;
+  // Quick prompt suggestions
+  const suggestions = [
+    "Make it more modern",
+    "Add more vibrant colors",
+    "Improve text hierarchy",
+    "Make it minimalist",
+  ];
 
-    const userMessage: Message = { role: "user", content: input.trim() };
-    setMessages((prev) => [...prev, userMessage]);
-    setInput("");
+  const handleImproveDesign = async () => {
+    if (!canvas || !canvasActions || !prompt.trim() || !canvasId) {
+      setError("Please enter a prompt");
+      return;
+    }
+
     setLoading(true);
+    setError(null);
 
     try {
-      // Later: send canvas + message to your AI backend
-      // const res = await fetch("/api/ai/canvas-chat", { ... });
-      // const data = await res.json();
-      // const reply = data.reply ?? "AI suggestion...";
-      const reply =
-        "Here’s a suggestion: try adding a bold title at the top and use a contrasting accent color for your call-to-action button.";
+      const currentCanvasData = canvasActions.getCanvasJSON?.();
+      if (!currentCanvasData) {
+        throw new Error("Failed to get canvas data");
+      }
 
-      const assistantMessage: Message = {
-        role: "assistant",
-        content: reply,
-      };
-      setMessages((prev) => [...prev, assistantMessage]);
-    } catch (e) {
-      setMessages((prev) => [
-        ...prev,
-        {
-          role: "assistant",
-          content:
-            "Something went wrong while generating suggestions. Please try again.",
-        },
-      ]);
+      const galleryRes = await fetch(
+        `/api/imagekit/list/${canvas.project._id}`
+      );
+      const galleryData = await galleryRes.json();
+      const galleryImages = galleryData.success ? galleryData.images : [];
+
+      const response = await fetch("/api/ai/improve-design", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          canvasId,
+          canvasData: currentCanvasData,
+          galleryImages,
+          userPrompt: prompt,
+        }),
+      });
+
+      if (!response.ok) {
+        const errData = await response.json();
+        throw new Error(errData.error || "Failed to improve design");
+      }
+
+      const result = await response.json();
+      canvasActions.loadCanvasJSON?.(result.canvasData);
+
+      setPrompt("");
+      setError(null);
+    } catch (err) {
+      console.error("AI improve error:", err);
+      setError(err instanceof Error ? err.message : "Something went wrong");
     } finally {
       setLoading(false);
     }
   };
 
+  const handleSuggestionClick = (suggestion: string) => {
+    setPrompt(suggestion);
+  };
+
   return (
-    <div className="flex flex-col h-full gap-3">
-      <div className="text-xs text-gray-500">
-        Ask for layout, color, or content suggestions. The AI will respond based
-        on your current canvas and project context.
+    <div className="space-y-4">
+      {/* Header */}
+      <div className="flex items-center gap-2">
+        <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-purple-500 to-pink-500 flex items-center justify-center">
+          <Wand2 className="w-4 h-4 text-white" />
+        </div>
+        <div>
+          <h4 className="text-sm font-semibold text-gray-900">AI Assistant</h4>
+          <p className="text-xs text-gray-500">Improve your design</p>
+        </div>
       </div>
 
-      <div className="flex-1 border rounded-md p-2 bg-gray-50 overflow-y-auto space-y-2">
-        {messages.length === 0 && (
-          <div className="text-xs text-gray-400">
-            Example: “Make this poster more minimalist” or “Suggest a better
-            hero layout.”
-          </div>
-        )}
-
-        {messages.map((m, idx) => (
-          <div
-            key={idx}
-            className={`text-xs rounded-md px-2 py-1 ${
-              m.role === "user"
-                ? "bg-indigo-100 text-indigo-900 self-end"
-                : "bg-white text-gray-800 border"
-            }`}
-          >
-            {m.content}
-          </div>
-        ))}
+      {/* Quick Suggestions */}
+      <div>
+        <Label className="text-xs font-medium text-gray-700 mb-2 block">
+          Quick Ideas
+        </Label>
+        <div className="flex flex-wrap gap-2">
+          {suggestions.map((suggestion, idx) => (
+            <button
+              key={idx}
+              onClick={() => handleSuggestionClick(suggestion)}
+              className="px-3 py-1.5 text-xs bg-gray-100 hover:bg-gray-200 rounded-full transition-colors"
+            >
+              {suggestion}
+            </button>
+          ))}
+        </div>
       </div>
 
-      <div className="space-y-2">
+      {/* Prompt Input */}
+      <div>
+        <Label className="text-xs font-medium text-gray-700 mb-2 block">
+          Your Request
+        </Label>
         <Textarea
+          placeholder="Describe what you want to change..."
+          value={prompt}
+          onChange={(e) => setPrompt(e.target.value)}
           rows={3}
-          value={input}
-          onChange={(e) => setInput(e.target.value)}
-          placeholder="Describe what you want the AI to improve or generate..."
-          className="text-xs"
+          className="text-sm resize-none"
         />
-        <Button
-          size="sm"
-          className="w-full"
-          onClick={sendMessage}
-          disabled={loading}
-        >
-          {loading ? "Thinking..." : "Ask AI"}
-        </Button>
       </div>
+
+      {/* Error */}
+      {error && (
+        <div className="text-xs text-red-600 bg-red-50 border border-red-200 p-3 rounded-lg">
+          {error}
+        </div>
+      )}
+
+      {/* Action Button */}
+      <Button
+        onClick={handleImproveDesign}
+        disabled={loading || !prompt.trim()}
+        className="w-full bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700"
+        size="default"
+      >
+        {loading ? (
+          <>
+            <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+            Design...
+          </>
+        ) : (
+          <>
+            <Sparkles className="w-4 h-4 mr-2" />
+            Send
+          </>
+        )}
+      </Button>
     </div>
   );
 };
+
+// ✅ Add Label import
+import { Label } from "@/components/ui/label";
 
 export default AIAssistantPanel;

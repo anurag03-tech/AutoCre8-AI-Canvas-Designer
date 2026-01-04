@@ -1,3 +1,5 @@
+// components/layout/toolbar/PropertiesPanel.tsx (UPDATED SMART VERSION)
+
 "use client";
 
 import React, { useState, useEffect } from "react";
@@ -42,7 +44,7 @@ const PropertiesPanel = ({
   onSendToBack,
   onDuplicate,
 }: PropertiesProps) => {
-  const { canvasActions } = useCanvas(); // ✅ Add this to access applyImageTransformation
+  const { canvasActions } = useCanvas();
   const [fillColor, setFillColor] = useState("#3b82f6");
   const [strokeColor, setStrokeColor] = useState("#000000");
   const [strokeWidth, setStrokeWidth] = useState(2);
@@ -51,6 +53,8 @@ const PropertiesPanel = ({
   );
   const [opacity, setOpacity] = useState(100);
   const [borderRadius, setBorderRadius] = useState(0);
+  const [hasGradient, setHasGradient] = useState(false);
+  const [gradientColors, setGradientColors] = useState<string[]>([]); // ✅ Store gradient colors
 
   const fonts = [
     "Arial",
@@ -70,7 +74,6 @@ const PropertiesPanel = ({
     "Monaco",
   ];
 
-  // ✅ ImageKit transformations
   const imageTransformations = [
     {
       id: "removeBg",
@@ -106,7 +109,26 @@ const PropertiesPanel = ({
 
   useEffect(() => {
     if (selectedObject) {
-      setFillColor(selectedObject.fill || "#3b82f6");
+      // ✅ Smart gradient detection and color extraction
+      const isGradient =
+        typeof selectedObject.fill === "object" &&
+        selectedObject.fill !== null &&
+        selectedObject.fill.colorStops !== undefined;
+
+      setHasGradient(isGradient);
+
+      if (isGradient) {
+        const gradient = selectedObject.fill as any;
+        const colors = gradient.colorStops.map((stop: any) => stop.color);
+        setGradientColors(colors);
+
+        // ✅ Use first color for color picker
+        setFillColor(colors[0] || "#3b82f6");
+      } else {
+        setGradientColors([]);
+        setFillColor(selectedObject.fill || "#3b82f6");
+      }
+
       setStrokeColor(selectedObject.stroke || "#000000");
       setStrokeWidth(selectedObject.strokeWidth || 0);
       setOpacity((selectedObject.opacity || 1) * 100);
@@ -131,9 +153,38 @@ const PropertiesPanel = ({
     );
   }
 
+  // ✅ Smart fill change - updates gradient if exists, otherwise solid color
   const handleFillChange = (color: string) => {
     setFillColor(color);
-    onUpdate({ fill: color });
+
+    if (hasGradient && gradientColors.length > 0) {
+      // ✅ Update gradient's primary color (first color)
+      const { Gradient } = require("fabric");
+
+      const newColors = [...gradientColors];
+      newColors[0] = color; // Update first color
+
+      const fabricGradient = new Gradient({
+        type: "linear",
+        gradientUnits: "pixels",
+        coords: {
+          x1: 0,
+          y1: 0,
+          x2: 0,
+          y2: selectedObject.height || 100,
+        },
+        colorStops: newColors.map((c, i) => ({
+          offset: i / (newColors.length - 1),
+          color: c,
+        })),
+      });
+
+      setGradientColors(newColors);
+      onUpdate({ fill: fabricGradient });
+    } else {
+      // ✅ Regular solid color update
+      onUpdate({ fill: color });
+    }
   };
 
   const handleStrokeChange = (color: string) => {
@@ -183,7 +234,7 @@ const PropertiesPanel = ({
         </h4>
       </div>
 
-      {/* ✅ IMAGE TRANSFORMATIONS SECTION - Add at top for images */}
+      {/* IMAGE TRANSFORMATIONS */}
       {selectedObject.type === "image" && (
         <div className="border-b pb-4">
           <Label className="text-xs font-semibold text-gray-700 mb-3 block">
@@ -284,7 +335,27 @@ const PropertiesPanel = ({
         <div>
           <Label className="text-xs font-semibold text-gray-700 mb-2 block">
             {selectedObject.type === "i-text" ? "Text Color" : "Fill Color"}
+            {hasGradient && (
+              <span className="ml-2 text-xs font-normal text-purple-600">
+                (Gradient)
+              </span>
+            )}
           </Label>
+
+          {/* ✅ Show gradient color chips if gradient exists */}
+          {hasGradient && gradientColors.length > 1 && (
+            <div className="flex gap-1 mb-2">
+              {gradientColors.map((color, index) => (
+                <div
+                  key={index}
+                  className="w-6 h-6 rounded border border-gray-300"
+                  style={{ backgroundColor: color }}
+                  title={color}
+                />
+              ))}
+            </div>
+          )}
+
           <div className="flex gap-2">
             <Input
               type="color"
@@ -299,6 +370,12 @@ const PropertiesPanel = ({
               className="flex-1 uppercase text-xs"
             />
           </div>
+
+          {hasGradient && (
+            <p className="text-xs text-gray-500 mt-1">
+              Editing primary gradient color
+            </p>
+          )}
         </div>
       )}
 
@@ -455,47 +532,45 @@ const PropertiesPanel = ({
         />
       </div>
 
-      {/* ✅ Image Size Controls */}
+      {/* Image Size Controls */}
       {selectedObject.type === "image" && (
-        <>
-          <div>
-            <Label className="text-xs font-semibold text-gray-700 mb-2 block">
-              Image Size
-            </Label>
-            <div className="grid grid-cols-2 gap-2">
-              <div>
-                <Label className="text-xs text-gray-500">Width</Label>
-                <Input
-                  type="number"
-                  value={Math.round(
-                    (selectedObject.width || 0) * (selectedObject.scaleX || 1)
-                  )}
-                  onChange={(e) => {
-                    const newWidth = parseInt(e.target.value);
-                    const scaleX = newWidth / (selectedObject.width || 1);
-                    onUpdate({ scaleX });
-                  }}
-                  className="w-full"
-                />
-              </div>
-              <div>
-                <Label className="text-xs text-gray-500">Height</Label>
-                <Input
-                  type="number"
-                  value={Math.round(
-                    (selectedObject.height || 0) * (selectedObject.scaleY || 1)
-                  )}
-                  onChange={(e) => {
-                    const newHeight = parseInt(e.target.value);
-                    const scaleY = newHeight / (selectedObject.height || 1);
-                    onUpdate({ scaleY });
-                  }}
-                  className="w-full"
-                />
-              </div>
+        <div>
+          <Label className="text-xs font-semibold text-gray-700 mb-2 block">
+            Image Size
+          </Label>
+          <div className="grid grid-cols-2 gap-2">
+            <div>
+              <Label className="text-xs text-gray-500">Width</Label>
+              <Input
+                type="number"
+                value={Math.round(
+                  (selectedObject.width || 0) * (selectedObject.scaleX || 1)
+                )}
+                onChange={(e) => {
+                  const newWidth = parseInt(e.target.value);
+                  const scaleX = newWidth / (selectedObject.width || 1);
+                  onUpdate({ scaleX });
+                }}
+                className="w-full"
+              />
+            </div>
+            <div>
+              <Label className="text-xs text-gray-500">Height</Label>
+              <Input
+                type="number"
+                value={Math.round(
+                  (selectedObject.height || 0) * (selectedObject.scaleY || 1)
+                )}
+                onChange={(e) => {
+                  const newHeight = parseInt(e.target.value);
+                  const scaleY = newHeight / (selectedObject.height || 1);
+                  onUpdate({ scaleY });
+                }}
+                className="w-full"
+              />
             </div>
           </div>
-        </>
+        </div>
       )}
 
       {/* Size (for shapes) */}

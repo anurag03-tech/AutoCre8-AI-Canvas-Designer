@@ -56,7 +56,7 @@ export async function POST(req: NextRequest) {
     const project = await Project.create({
       name: body.name,
       description: body.description || "",
-      brand: body.brandId || null, // ✅ Optional brand
+      brand: body.brandId || null,
       owner: auth.user?.id,
       collaborators: [],
       sharedAssets: [],

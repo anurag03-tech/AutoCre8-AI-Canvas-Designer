@@ -42,12 +42,15 @@ export interface CanvasActions {
   bringToFront: () => void;
   sendToBack: () => void;
   duplicateSelected: () => void;
+  getCanvasJSON: () => any | null;
+  loadCanvasJSON: (data: any) => void;
 }
 
 interface CanvasContextType {
   canvas: Canvas | null;
   setCanvas: (canvas: Canvas | null) => void;
   updateCanvasName: (name: string) => void;
+  updateCanvas: (updates: Partial<Canvas>) => void;
   canvasActions: CanvasActions | null;
   setCanvasActions: (actions: CanvasActions | null) => void;
   selectedObject: any;
@@ -69,12 +72,20 @@ export const CanvasProvider = ({ children }: { children: ReactNode }) => {
     }
   };
 
+  // Update any canvas fields
+  const updateCanvas = (updates: Partial<Canvas>) => {
+    if (canvas) {
+      setCanvas({ ...canvas, ...updates });
+    }
+  };
+
   return (
     <CanvasContext.Provider
       value={{
         canvas,
         setCanvas,
         updateCanvasName,
+        updateCanvas,
         canvasActions,
         setCanvasActions,
         selectedObject,

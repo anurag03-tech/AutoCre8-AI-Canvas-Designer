@@ -1,3 +1,4 @@
+// app/src/hooks/useFabricCanvas.ts
 "use client";
 
 import { useEffect, useRef, useState, useCallback } from "react";
@@ -12,6 +13,7 @@ import {
   Polygon,
   Path,
   FabricObject,
+  Gradient,
   FabricImage,
 } from "fabric";
 import { imagekitTransformations } from "@/lib/imagekit";
@@ -39,10 +41,14 @@ export const useFabricCanvas = ({
 
   const [scale, setScale] = useState(1);
 
+  // ✅ NEW: Track canvas data changes
+  const prevCanvasDataRef = useRef<string>("");
+
   // Initialize Fabric canvas once
+  // hooks/useFabricCanvas.ts (UPDATE the canvas update section)
+
   useEffect(() => {
     if (!canvasRef.current || !containerRef.current || !canvasData) return;
-    if (fabricCanvasRef.current) return;
 
     const container = containerRef.current;
     const { width, height, background } = canvasData;
@@ -54,50 +60,86 @@ export const useFabricCanvas = ({
     const scaleY = containerHeight / height;
     const newScale = Math.min(scaleX, scaleY, 1);
 
-    const fabricCanvas = new Canvas(canvasRef.current, {
-      width: width * newScale,
-      height: height * newScale,
-      backgroundColor: background || "#ffffff",
-    });
+    // Check if canvas data actually changed
+    const currentDataString = JSON.stringify(canvasData);
+    const hasChanged = currentDataString !== prevCanvasDataRef.current;
 
-    fabricCanvas.setZoom(newScale);
-    fabricCanvasRef.current = fabricCanvas;
-    setScale(newScale);
+    if (!fabricCanvasRef.current) {
+      // First initialization
+      const fabricCanvas = new Canvas(canvasRef.current, {
+        width: width * newScale,
+        height: height * newScale,
+        backgroundColor: background || "#ffffff",
+      });
 
-    if (typeof window !== "undefined") {
-      (window as any).__fabricCanvas = fabricCanvas;
-    }
+      fabricCanvas.setZoom(newScale);
+      fabricCanvasRef.current = fabricCanvas;
+      setScale(newScale);
 
-    console.log("Loaded canvasData from DB:", canvasData);
+      if (typeof window !== "undefined") {
+        (window as any).__fabricCanvas = fabricCanvas;
+      }
 
-    if (canvasData && canvasData.objects) {
+      console.log("Loaded canvasData from DB:", canvasData);
+
+      if (canvasData && canvasData.objects) {
+        fabricCanvas.loadFromJSON(canvasData, () => {
+          fabricCanvas.requestRenderAll();
+          console.log("Fabric objects after load:", fabricCanvas.getObjects());
+        });
+      } else {
+        fabricCanvas.renderAll();
+      }
+
+      fabricCanvas.on("selection:created", (e) => {
+        if (e.selected?.length === 1) setSelectedObject(e.selected[0]);
+      });
+
+      fabricCanvas.on("selection:updated", (e) => {
+        if (e.selected?.length === 1) setSelectedObject(e.selected[0]);
+      });
+
+      fabricCanvas.on("selection:cleared", () => setSelectedObject(null));
+
+      prevCanvasDataRef.current = currentDataString;
+    } else if (hasChanged) {
+      // ✅ Canvas data changed - update existing canvas
+      console.log("🔄 Canvas data changed, updating Fabric canvas...");
+
+      const fabricCanvas = fabricCanvasRef.current;
+
+      // ✅ FIX: Use setDimensions instead of setWidth/setHeight
+      fabricCanvas.setDimensions({
+        width: width * newScale,
+        height: height * newScale,
+      });
+
+      fabricCanvas.setZoom(newScale);
+      setScale(newScale);
+
+      // Update background
+      fabricCanvas.set("backgroundColor", background || "#ffffff");
+
+      // Load new objects
       fabricCanvas.loadFromJSON(canvasData, () => {
         fabricCanvas.requestRenderAll();
-        console.log("Fabric objects after load:", fabricCanvas.getObjects());
+        console.log("✅ Fabric canvas updated with new data");
+        console.log("New objects:", fabricCanvas.getObjects());
       });
-    } else {
-      fabricCanvas.renderAll();
+
+      prevCanvasDataRef.current = currentDataString;
     }
 
-    fabricCanvas.on("selection:created", (e) => {
-      if (e.selected?.length === 1) setSelectedObject(e.selected[0]);
-    });
-
-    fabricCanvas.on("selection:updated", (e) => {
-      if (e.selected?.length === 1) setSelectedObject(e.selected[0]);
-    });
-
-    fabricCanvas.on("selection:cleared", () => setSelectedObject(null));
-
     return () => {
-      if (fabricCanvasRef.current) {
+      // Only dispose when component unmounts, not on every update
+      if (fabricCanvasRef.current && !canvasRef.current) {
         fabricCanvasRef.current.dispose();
         fabricCanvasRef.current = null;
       }
     };
   }, [canvasData, setSelectedObject]);
 
-  // ✅ All actions wrapped in useCallback
+  // All other methods remain the same...
   const addShape = useCallback((config: any) => {
     if (!fabricCanvasRef.current) return;
 
@@ -156,6 +198,46 @@ export const useFabricCanvas = ({
     fabricCanvasRef.current.renderAll();
   }, []);
 
+  // const addStyledText = useCallback((styleConfig: any) => {
+  //   if (!fabricCanvasRef.current) return;
+
+  //   const { text, gradient, shadow, ...props } = styleConfig;
+
+  //   const textObj = new IText(text || "STYLED TEXT", {
+  //     left: 100,
+  //     top: 100,
+  //     ...props,
+  //   });
+
+  //   if (gradient) {
+  //     const fabricGradient = new (window as any).fabric.Gradient({
+  //       type: gradient.type || "linear",
+  //       gradientUnits: "pixels",
+  //       coords: {
+  //         x1: 0,
+  //         y1: 0,
+  //         x2: gradient.type === "radial" ? textObj.width || 200 : 0,
+  //         y2: textObj.height || 100,
+  //       },
+  //       colorStops: gradient.colors.map((color: string, index: number) => ({
+  //         offset: index / (gradient.colors.length - 1),
+  //         color,
+  //       })),
+  //     });
+  //     textObj.set("fill", fabricGradient);
+  //   }
+
+  //   if (shadow) {
+  //     textObj.set("shadow", shadow);
+  //   }
+
+  //   fabricCanvasRef.current.add(textObj);
+  //   fabricCanvasRef.current.setActiveObject(textObj);
+  //   fabricCanvasRef.current.renderAll();
+  // }, []);
+
+  // hooks/useFabricCanvas.ts (FIX addStyledText method)
+
   const addStyledText = useCallback((styleConfig: any) => {
     if (!fabricCanvasRef.current) return;
 
@@ -167,8 +249,9 @@ export const useFabricCanvas = ({
       ...props,
     });
 
+    // ✅ FIX: Use Fabric.js v6 Gradient syntax
     if (gradient) {
-      const fabricGradient = new (window as any).fabric.Gradient({
+      const fabricGradient = new Gradient({
         type: gradient.type || "linear",
         gradientUnits: "pixels",
         coords: {
@@ -182,6 +265,7 @@ export const useFabricCanvas = ({
           color,
         })),
       });
+
       textObj.set("fill", fabricGradient);
     }
 
@@ -332,11 +416,124 @@ export const useFabricCanvas = ({
     [setSelectedObject]
   );
 
+  // const saveCanvas = useCallback(async () => {
+  //   if (!fabricCanvasRef.current || !canvas) return;
+
+  //   try {
+  //     const json = fabricCanvasRef.current.toJSON();
+
+  //     const payload = {
+  //       canvasData: {
+  //         ...json,
+  //         width: canvas.canvasData.width,
+  //         height: canvas.canvasData.height,
+  //         background:
+  //           fabricCanvasRef.current.backgroundColor ||
+  //           canvas.canvasData.background,
+  //       },
+  //     };
+
+  //     console.log("Saving canvasData:", payload.canvasData);
+
+  //     const res = await fetch(`/api/canvas/${canvasId}`, {
+  //       method: "PATCH",
+  //       headers: { "Content-Type": "application/json" },
+  //       body: JSON.stringify(payload),
+  //     });
+
+  //     if (res.ok) {
+  //       alert("Canvas saved!");
+  //     } else {
+  //       const err = await res.json().catch(() => null);
+  //       console.error("Save error:", err);
+  //       alert(`Failed to save: ${err?.error || res.statusText}`);
+  //     }
+  //   } catch (e) {
+  //     console.error("Error saving canvas:", e);
+  //     alert("Error saving");
+  //   }
+  // }, [canvas, canvasId]);
+
+  // const saveCanvas = useCallback(async () => {
+  //   if (!fabricCanvasRef.current || !canvas) return;
+
+  //   try {
+  //     // 1. Get canvas JSON
+  //     const json = fabricCanvasRef.current.toJSON();
+
+  //     // 2. 🔥 GENERATE THUMBNAIL (this is what was missing!)
+  //     const thumbnailDataURL = fabricCanvasRef.current.toDataURL({
+  //       format: "png",
+  //       quality: 0.7,
+  //       multiplier: 0.3, // 30% of original size for thumbnail
+  //     });
+
+  //     const payload = {
+  //       canvasData: {
+  //         ...json,
+  //         width: canvas.canvasData.width,
+  //         height: canvas.canvasData.height,
+  //         background:
+  //           fabricCanvasRef.current.backgroundColor ||
+  //           canvas.canvasData.background,
+  //       },
+  //       thumbnail: thumbnailDataURL, // 👈 ADD THIS!
+  //     };
+
+  //     console.log("Saving canvas with thumbnail...");
+
+  //     const res = await fetch(`/api/canvas/${canvasId}`, {
+  //       method: "PATCH",
+  //       headers: { "Content-Type": "application/json" },
+  //       body: JSON.stringify(payload),
+  //     });
+
+  //     if (res.ok) {
+  //       alert("Canvas saved with thumbnail! ✅");
+  //     } else {
+  //       const err = await res.json().catch(() => null);
+  //       console.error("Save error:", err);
+  //       alert(`Failed to save: ${err?.error || res.statusText}`);
+  //     }
+  //   } catch (e) {
+  //     console.error("Error saving canvas:", e);
+  //     alert("Error saving");
+  //   }
+  // }, [canvas, canvasId]);
+
   const saveCanvas = useCallback(async () => {
     if (!fabricCanvasRef.current || !canvas) return;
 
     try {
-      const json = fabricCanvasRef.current.toJSON();
+      const fabricCanvas = fabricCanvasRef.current;
+
+      // 1. Get canvas JSON
+      const json = fabricCanvas.toJSON();
+
+      // 2. 🔥 GENERATE THUMBNAIL AT FULL SIZE (not zoomed)
+      // Save current zoom and viewport
+      const currentZoom = fabricCanvas.getZoom();
+      const currentVpTransform = fabricCanvas.viewportTransform
+        ? [...fabricCanvas.viewportTransform]
+        : null;
+
+      // Temporarily reset zoom to 1:1 for thumbnail
+      fabricCanvas.setZoom(1);
+      fabricCanvas.setViewportTransform([1, 0, 0, 1, 0, 0]);
+
+      // Generate thumbnail at actual size
+      const thumbnailDataURL = fabricCanvas.toDataURL({
+        format: "png",
+        quality: 0.8,
+        multiplier: 0.3, // 30% of actual size for smaller file
+      });
+
+      // Restore original zoom and viewport
+      fabricCanvas.setZoom(currentZoom);
+      if (currentVpTransform) {
+        fabricCanvas.setViewportTransform(currentVpTransform);
+      }
+      fabricCanvas.renderAll();
 
       const payload = {
         canvasData: {
@@ -344,12 +541,12 @@ export const useFabricCanvas = ({
           width: canvas.canvasData.width,
           height: canvas.canvasData.height,
           background:
-            fabricCanvasRef.current.backgroundColor ||
-            canvas.canvasData.background,
+            fabricCanvas.backgroundColor || canvas.canvasData.background,
         },
+        thumbnail: thumbnailDataURL,
       };
 
-      console.log("Saving canvasData:", payload.canvasData);
+      console.log("💾 Saving canvas with thumbnail...");
 
       const res = await fetch(`/api/canvas/${canvasId}`, {
         method: "PATCH",
@@ -358,7 +555,7 @@ export const useFabricCanvas = ({
       });
 
       if (res.ok) {
-        alert("Canvas saved!");
+        alert("Canvas saved! ✅");
       } else {
         const err = await res.json().catch(() => null);
         console.error("Save error:", err);
@@ -425,7 +622,29 @@ export const useFabricCanvas = ({
     }
   }, []);
 
-  // ✅ Correct dependency array - no more ESLint warnings
+  const getCanvasJSON = useCallback(() => {
+    if (!fabricCanvasRef.current) return null;
+
+    return {
+      version: fabricCanvasRef.current.toJSON().version,
+      objects: fabricCanvasRef.current.toJSON().objects,
+      background: fabricCanvasRef.current.backgroundColor || "#ffffff",
+      width: canvas?.canvasData.width || fabricCanvasRef.current.getWidth(),
+      height: canvas?.canvasData.height || fabricCanvasRef.current.getHeight(),
+    };
+  }, [canvas]);
+
+  const loadCanvasJSON = useCallback((newCanvasData: any) => {
+    if (!fabricCanvasRef.current) return;
+
+    console.log("📥 Loading new canvas data:", newCanvasData);
+
+    fabricCanvasRef.current.loadFromJSON(newCanvasData, () => {
+      fabricCanvasRef.current?.requestRenderAll();
+      console.log("✅ Canvas reloaded");
+    });
+  }, []);
+
   useEffect(() => {
     setCanvasActions({
       addShape,
@@ -442,6 +661,8 @@ export const useFabricCanvas = ({
       bringToFront,
       sendToBack,
       duplicateSelected,
+      getCanvasJSON,
+      loadCanvasJSON,
     });
 
     return () => setCanvasActions(null);
@@ -461,6 +682,8 @@ export const useFabricCanvas = ({
     bringToFront,
     sendToBack,
     duplicateSelected,
+    getCanvasJSON,
+    loadCanvasJSON,
   ]);
 
   return {

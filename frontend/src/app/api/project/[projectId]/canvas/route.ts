@@ -1,8 +1,11 @@
+// frontend/src/app/api/project/[projectId]/canvas/route.ts
+
 import { NextRequest, NextResponse } from "next/server";
 import { requireAuth } from "@/lib/auth";
 import connectDB from "@/lib/connectDB";
 import Canvas from "@/models/Canvas";
 import Project from "@/models/Project";
+import { CANVAS_TEMPLATES } from "@/lib/constants";
 
 // GET - List canvases
 export async function GET(
@@ -69,7 +72,8 @@ export async function POST(
       return NextResponse.json({ error: "Access denied" }, { status: 403 });
     }
 
-    const { name, description, template } = await req.json();
+    const { name, description, template, customWidth, customHeight } =
+      await req.json();
 
     if (!name) {
       return NextResponse.json(
@@ -78,40 +82,65 @@ export async function POST(
       );
     }
 
-    const CANVAS_TEMPLATES: Record<
-      string,
-      { width: number; height: number; unit: string }
-    > = {
-      "instagram-post": { width: 1080, height: 1080, unit: "px" },
-      "instagram-story": { width: 1080, height: 1920, unit: "px" },
-      "facebook-post": { width: 1200, height: 630, unit: "px" },
-      "twitter-post": { width: 1200, height: 675, unit: "px" },
-      "linkedin-post": { width: 1200, height: 627, unit: "px" },
-      "youtube-thumbnail": { width: 1280, height: 720, unit: "px" },
-      poster: { width: 18, height: 24, unit: "in" },
-      flyer: { width: 8.5, height: 11, unit: "in" },
-      "business-card": { width: 3.5, height: 2, unit: "in" },
-      "presentation-slide": { width: 1920, height: 1080, unit: "px" },
-      "web-banner": { width: 728, height: 90, unit: "px" },
-      custom: { width: 1920, height: 1080, unit: "px" },
-    };
+    // ✅ Handle custom dimensions
+    let width: number;
+    let height: number;
+    let unit: string;
 
-    const templateConfig =
-      CANVAS_TEMPLATES[template] || CANVAS_TEMPLATES.custom;
+    if (template === "custom") {
+      // Custom canvas - use provided dimensions
+      if (!customWidth || !customHeight) {
+        return NextResponse.json(
+          { error: "Custom canvas requires width and height" },
+          { status: 400 }
+        );
+      }
 
+      // Validate dimensions
+      const w = parseInt(customWidth);
+      const h = parseInt(customHeight);
+
+      if (isNaN(w) || isNaN(h) || w < 1 || w > 10000 || h < 1 || h > 10000) {
+        return NextResponse.json(
+          { error: "Canvas dimensions must be between 1 and 10000 pixels" },
+          { status: 400 }
+        );
+      }
+
+      width = w;
+      height = h;
+      unit = "px";
+    } else {
+      // Preset template - use template config
+      const templateConfig =
+        CANVAS_TEMPLATES[template as keyof typeof CANVAS_TEMPLATES];
+
+      if (!templateConfig) {
+        return NextResponse.json(
+          { error: "Invalid template" },
+          { status: 400 }
+        );
+      }
+
+      width = templateConfig.width;
+      height = templateConfig.height;
+      unit = templateConfig.unit;
+    }
+
+    // Create canvas
     const canvas = await Canvas.create({
       name,
       description,
       template,
       project: projectId,
       owner: userId,
-      unit: templateConfig.unit,
+      unit,
       canvasData: {
         version: "1.0.0",
         objects: [],
         background: "#ffffff",
-        width: templateConfig.width,
-        height: templateConfig.height,
+        width,
+        height,
       },
     });
 

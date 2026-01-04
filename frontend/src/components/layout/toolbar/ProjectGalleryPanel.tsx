@@ -72,7 +72,7 @@ const ProjectGalleryPanel = () => {
   return (
     <div className="space-y-4">
       <div>
-        <h4 className="text-xs font-semibold text-gray-500 uppercase mb-3">
+        <h4 className="text-s font-semibold text-blue-600 uppercase mb-3">
           Project Gallery ({images.length})
         </h4>
 

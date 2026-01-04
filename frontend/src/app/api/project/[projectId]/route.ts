@@ -1,3 +1,5 @@
+// frontend/src/app/api/project/[projectId]/route.ts
+
 import { NextRequest, NextResponse } from "next/server";
 import { requireAuth } from "@/lib/auth";
 import connectDB from "@/lib/connectDB";

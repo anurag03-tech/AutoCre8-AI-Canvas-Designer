@@ -228,7 +228,7 @@ const ImagesPanel = () => {
         />
 
         <Button
-          className="w-full h-24 flex flex-col items-center justify-center gap-2 bg-purple-500 hover:bg-purple-600"
+          className="w-full h-10 flex flex-row items-center justify-center gap-2 bg-purple-500 hover:bg-purple-600"
           onClick={handleUploadClick}
           disabled={uploading}
         >
@@ -237,9 +237,9 @@ const ImagesPanel = () => {
             {uploading ? "Uploading..." : "Upload Image"}
           </span>
         </Button>
-        <p className="text-xs text-gray-500 mt-2">
+        {/* <p className="text-xs text-gray-500 mt-2">
           Supports JPG, PNG, GIF, WebP (max 10MB)
-        </p>
+        </p> */}
       </div>
 
       {/* Add by URL */}
@@ -269,7 +269,7 @@ const ImagesPanel = () => {
 
       {/* Pixabay Search */}
       <div>
-        <h4 className="text-xs font-semibold text-gray-500 uppercase mb-2">
+        <h4 className="text-[15px] font-semibold text-gray-500 uppercase mb-2">
           Search Stock Images (Pixabay)
         </h4>
 
@@ -301,21 +301,22 @@ const ImagesPanel = () => {
           </Button>
         </div>
 
-        <div className="flex gap-2 mb-2">
+        <div className="flex gap-2 mb-2 bord">
           <Input
-            placeholder="e.g. neon background"
-            className="flex-1"
+            placeholder=""
+            className="flex-1 border-2 border-gray-300"
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             onKeyDown={handleSearchKeyPress}
           />
           <Button
+            className="cursor-pointer bg-blue-500 hover:bg-blue-600"
             size="sm"
             variant="outline"
             onClick={handleSearch}
             disabled={searching || uploading}
           >
-            <Search className="w-4 h-4" />
+            <Search className="w-4 h-5 text-white" />
           </Button>
         </div>
 
@@ -352,9 +353,6 @@ const ImagesPanel = () => {
             </p>
           )}
         </div>
-        <p className="text-[10px] text-gray-400 mt-1">
-          Images uploaded to ImageKit for transformations
-        </p>
       </div>
     </div>
   );

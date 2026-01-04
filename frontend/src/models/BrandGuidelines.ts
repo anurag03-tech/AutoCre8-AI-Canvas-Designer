@@ -66,8 +66,8 @@ export const BrandGuidelinesSchema = new Schema<IBrandGuidelines>(
     },
 
     fonts: {
-      heading: { type: String, required: true },
-      body: { type: String, required: true },
+      heading: { type: String },
+      body: { type: String },
       suggested: [{ type: String }],
     },
 
