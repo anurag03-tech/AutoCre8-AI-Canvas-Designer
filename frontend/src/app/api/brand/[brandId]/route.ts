@@ -4,9 +4,8 @@ import { NextRequest, NextResponse } from "next/server";
 import { requireAuth } from "@/lib/auth";
 import connectDB from "@/lib/connectDB";
 import mongoose from "mongoose";
-
 // Import all models from index to ensure proper registration
-import { User, Brand } from "@/models";
+import { User, Brand, Canvas, Project } from "@/models";
 
 // GET - Get brand by ID
 export async function GET(
