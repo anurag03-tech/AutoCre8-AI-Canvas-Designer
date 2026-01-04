@@ -314,11 +314,10 @@ const BrandDetailPage = () => {
         <div className="bg-white border border-gray-200 rounded-xl shadow-sm p-8 mb-8">
           <div className="flex items-start gap-6">
             <div className="relative w-24 h-24 rounded-xl bg-gray-50 border border-gray-200 overflow-hidden flex-shrink-0 p-2">
-              <Image
+              <img
                 src={brand.logoUrl}
                 alt={brand.name}
-                fill
-                className="object-contain"
+                className="w-full h-full object-contain"
               />
             </div>
             <div className="flex-1">

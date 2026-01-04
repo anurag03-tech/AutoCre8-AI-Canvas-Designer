@@ -4,7 +4,6 @@ import React, { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Plus, Building2, Users, Trash2, Edit } from "lucide-react";
-import Image from "next/image";
 
 interface Brand {
   _id: string;
@@ -192,11 +191,10 @@ const BrandCard = ({
       {/* Logo Section */}
       <div className="h-40 bg-gradient-to-br from-indigo-50 to-purple-50 flex items-center justify-center relative">
         <div className="relative w-24 h-24 rounded-lg overflow-hidden shadow-md">
-          <Image
+          <img
             src={brand.logoUrl}
             alt={brand.name}
-            fill
-            className="object-cover"
+            className="w-full h-full object-cover"
           />
         </div>
         {!isOwner && brand.owner && (

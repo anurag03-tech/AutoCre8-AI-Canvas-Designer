@@ -43,7 +43,7 @@ export async function POST(req: NextRequest) {
       values,
       mission,
       vision,
-      owner: auth.user.id,
+      owner: auth?.user?.id,
       viewers: [],
     });
 

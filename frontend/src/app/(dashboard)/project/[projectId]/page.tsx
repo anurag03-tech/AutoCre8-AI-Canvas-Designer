@@ -366,12 +366,10 @@ const ProjectDetailPage = () => {
                 <div className="h-4 w-px bg-gray-300" />
                 <div className="flex items-center gap-2">
                   <div className="relative w-10 h-10 rounded justify-center items-center flex overflow-hidden border border-gray-200">
-                    <Image
+                    <img
                       src={project.brand.logoUrl}
                       alt={project.brand.name}
-                      width={100}
-                      height={100}
-                      className="object-cover"
+                      className="w-full h-full object-cover"
                     />
                   </div>
                   <span className="text-lg text-gray-600">

@@ -5,7 +5,6 @@ import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Plus, Trash2, Search, FolderOpen, Calendar } from "lucide-react";
-import Image from "next/image";
 
 interface Brand {
   _id: string;
@@ -268,11 +267,10 @@ const ProjectPage = () => {
                   <div className="relative aspect-video bg-gradient-to-br from-blue-50 to-blue-100 flex items-center justify-center">
                     {p.brand ? (
                       <div className="relative w-16 h-16">
-                        <Image
+                        <img
                           src={p.brand.logoUrl}
                           alt={p.brand.name}
-                          fill
-                          className="object-contain"
+                          className="w-full h-full object-contain"
                         />
                       </div>
                     ) : (

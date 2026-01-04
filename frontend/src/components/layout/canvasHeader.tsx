@@ -137,7 +137,7 @@ const CanvasHeader = ({
           userId: "current-user",
           canvasId: canvas._id,
           projectId: canvas.project._id,
-          brandId: canvas.project.brandId || null,
+          brandId: canvas.project?.brandId || null,
           canvasData: currentCanvasJSON,
           canvasScreenshot: canvasImageBase64,
           galleryImages: [],

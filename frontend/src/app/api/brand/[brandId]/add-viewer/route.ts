@@ -1,8 +1,8 @@
+// src/app/api/brand/[brandId]/add-viewer/route.ts
+
 import { NextRequest, NextResponse } from "next/server";
 import { requireAuth } from "@/lib/auth";
 import connectDB from "@/lib/connectDB";
-
-// Import models from index
 import { User, Brand } from "@/models";
 
 export async function POST(
@@ -14,6 +14,13 @@ export async function POST(
 
     const auth = await requireAuth(req);
     if (!auth.authorized) return auth.response;
+
+    if (!auth.user?.id) {
+      return NextResponse.json(
+        { success: false, error: "Unauthorized" },
+        { status: 401 }
+      );
+    }
 
     await connectDB();
 
@@ -35,15 +42,13 @@ export async function POST(
       );
     }
 
-    // Only owner can add viewers
-    if (brand.owner.toString() !== auth.user.id) {
+    if (brand.owner.toString() !== auth?.user?.id) {
       return NextResponse.json(
         { success: false, error: "Only owner can add viewers" },
         { status: 403 }
       );
     }
 
-    // Find user by email
     const userToAdd = await User.findOne({ email: email.toLowerCase() });
 
     if (!userToAdd) {
@@ -53,7 +58,6 @@ export async function POST(
       );
     }
 
-    // Check if user is already owner
     if (userToAdd._id.toString() === brand.owner.toString()) {
       return NextResponse.json(
         { success: false, error: "User is already the owner" },
@@ -61,7 +65,8 @@ export async function POST(
       );
     }
 
-    // Check if user is already a viewer
+    // ✅ FIXED: Use any with eslint-disable comment
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     if (
       brand.viewers.some((v: any) => v.toString() === userToAdd._id.toString())
     ) {
@@ -71,7 +76,6 @@ export async function POST(
       );
     }
 
-    // Add viewer
     brand.viewers.push(userToAdd._id);
     await brand.save();
 
@@ -85,10 +89,13 @@ export async function POST(
         image: userToAdd.image,
       },
     });
-  } catch (error: any) {
+  } catch (error) {
     console.error("Error adding viewer:", error);
     return NextResponse.json(
-      { success: false, error: error.message || "Failed to add viewer" },
+      {
+        success: false,
+        error: error instanceof Error ? error.message : "Failed to add viewer",
+      },
       { status: 500 }
     );
   }

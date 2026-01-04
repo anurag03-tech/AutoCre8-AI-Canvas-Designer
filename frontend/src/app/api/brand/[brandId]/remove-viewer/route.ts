@@ -1,8 +1,8 @@
+// src/app/api/brand/[brandId]/remove-viewer/route.ts
+
 import { NextRequest, NextResponse } from "next/server";
 import { requireAuth } from "@/lib/auth";
 import connectDB from "@/lib/connectDB";
-
-// Import models from index
 import { Brand } from "@/models";
 
 export async function POST(
@@ -14,6 +14,13 @@ export async function POST(
 
     const auth = await requireAuth(req);
     if (!auth.authorized) return auth.response;
+
+    if (!auth.user?.id) {
+      return NextResponse.json(
+        { success: false, error: "Unauthorized" },
+        { status: 401 }
+      );
+    }
 
     await connectDB();
 
@@ -35,7 +42,6 @@ export async function POST(
       );
     }
 
-    // Only owner can remove viewers
     if (brand.owner.toString() !== auth.user.id) {
       return NextResponse.json(
         { success: false, error: "Only owner can remove viewers" },
@@ -43,7 +49,8 @@ export async function POST(
       );
     }
 
-    // Remove viewer
+    // ✅ FIXED: Use any with eslint-disable comment
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     brand.viewers = brand.viewers.filter((v: any) => v.toString() !== userId);
     await brand.save();
 
@@ -51,10 +58,14 @@ export async function POST(
       success: true,
       message: "Viewer removed successfully",
     });
-  } catch (error: any) {
+  } catch (error) {
     console.error("Error removing viewer:", error);
     return NextResponse.json(
-      { success: false, error: error.message || "Failed to remove viewer" },
+      {
+        success: false,
+        error:
+          error instanceof Error ? error.message : "Failed to remove viewer",
+      },
       { status: 500 }
     );
   }
