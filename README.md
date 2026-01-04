@@ -2,13 +2,13 @@
 
 AutoCre8 is a professional canvas-based design platform with AI-powered design assistance. Create stunning graphics, social media posts, presentations, and more with intelligent layout suggestions and automated design improvements.
 
-![Screenshot 1](./frontend/public/1.png) ![Screenshot 2](./frontend/public/2.png)
+| |  |
+|:---:|:---:|
+| ![Screenshot 1](./frontend/public/1.png) | ![Screenshot 2](./frontend/public/2.png) |
+| ![Screenshot 3](./frontend/public/3.png) | ![Screenshot 4](./frontend/public/4.png) |
+| ![Screenshot 5](./frontend/public/5.png) | ![Screenshot 6](./frontend/public/6.png) |
+| ![Screenshot 7](./frontend/public/7.png) | ![Screenshot 8](./frontend/public/8.png) |
 
-![Screenshot 3](./frontend/public/3.png) ![Screenshot 4](./frontend/public/4.png)
-
-![Screenshot 5](./frontend/public/5.png) ![Screenshot 6](./frontend/public/6.png)
-
-![Screenshot 7](./frontend/public/7.png) ![Screenshot 8](./frontend/public/8.png)
 
 ## ✨ Features
 
