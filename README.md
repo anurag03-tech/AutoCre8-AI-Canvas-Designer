@@ -88,67 +88,6 @@ AutoCre8 is a professional canvas-based design platform with AI-powered design a
 ├── NextAuth.js (Authentication)
 ```
 
-## 📁 Project Structure
-
-```
-autocre8/
-├── frontend/
-│   ├── app/
-│   │   ├── (root)/             # Landing & Authentication pages
-│   │   ├── (dashboard)/        # Dashboard & canvas
-│   │   └── api/                # API routes
-│   ├── components/
-│   │   ├── layout/             # Layout components
-│   │   │   ├── CanvasHeader.tsx
-│   │   │   ├── CanvasToolbox.tsx
-│   │   │   └── toolbar/        # Toolbar panels
-│   │   ├── shared/             # Shared components
-│   │   └── ui/                 # shadcn/ui components
-│   ├── contexts/
-│   │   └── CanvasContext.tsx   # Global canvas state
-│   ├── hooks/
-│   │   ├── useFabricCanvas.ts  # Fabric.js hook
-│   │   └── useCanvasKeyboard.ts
-│   ├── lib/
-│   │   ├── auth.ts             # NextAuth config
-│   │   ├── connectDB.ts        # MongoDB connection
-│   │   └── imagekit.ts         # ImageKit config
-│   └── models/                 # MongoDB schemas
-│
-└── ai-service/                  # FastAPI backend
-    ├── app/
-    │   ├── constants/          # Design system constants
-    │   │   ├── design_system.py
-    │   │   ├── text_styles.py
-    │   │   ├── fabric_elements.py
-    │   │   └── prompts.py
-    │   ├── graphs/             # LangGraph workflows
-    │   │   ├── nodes/          # Workflow nodes
-    │   │   │   ├── analysis/
-    │   │   │   ├── planning/
-    │   │   │   ├── generation/
-    │   │   │   └── building/
-    │   │   └── workflows/
-    │   │       ├── create_workflow.py
-    │   │       ├── resize_workflow.py
-    │   │       └── task_router.py
-    │   ├── models/             # Pydantic models
-    │   │   ├── canvas.py
-    │   │   ├── brand.py
-    │   │   ├── content.py
-    │   │   ├── image.py
-    │   │   └── state.py
-    │   ├── services/           # Business logic
-    │   │   ├── llm_service.py
-    │   │   ├── image_service.py
-    │   │   ├── canvas_builder.py
-    │   │   ├── layout_engine.py
-    │   │   ├── pixabay_service.py
-    │   │   └── imagekit_service.py
-    │   └── routes/             # API endpoints
-    │
-    └── main.py                 # FastAPI app
-```
 
 ## 🚀 Getting Started
 
@@ -199,17 +138,17 @@ FASTAPI_URL=http://localhost:8000
 
 #### 3. Setup AI Service
 
-````bash
+```bash
 cd ai-service
 python -m venv venv
 source venv/bin/activate  # On Windows: venv\Scripts\activate
 pip install -r requirements.txt
 
-# Create .env
-
+```
 **AI Service Environment Variables:**
-
 ```env
+
+# Create .env
 
 # MongoDB
 MONGODB_URI=mongodb+srv://.....
@@ -231,7 +170,7 @@ IMAGEKIT_URL_ENDPOINT=https://ik.imagekit.io/your_id
 
 # Pixabay
 PIXABAY_API_KEY=...
-````
+```
 
 ### Running the Application
 
@@ -301,4 +240,66 @@ Analyze Aspect Ratio Change
 AI Repositions Elements (not just scaling)
     ↓
 Returns New Canvas Data
+```
+
+## 📁 Project Structure
+
+```
+autocre8/
+├── frontend/
+│   ├── app/
+│   │   ├── (root)/             # Landing & Authentication pages
+│   │   ├── (dashboard)/        # Dashboard & canvas
+│   │   └── api/                # API routes
+│   ├── components/
+│   │   ├── layout/             # Layout components
+│   │   │   ├── CanvasHeader.tsx
+│   │   │   ├── CanvasToolbox.tsx
+│   │   │   └── toolbar/        # Toolbar panels
+│   │   ├── shared/             # Shared components
+│   │   └── ui/                 # shadcn/ui components
+│   ├── contexts/
+│   │   └── CanvasContext.tsx   # Global canvas state
+│   ├── hooks/
+│   │   ├── useFabricCanvas.ts  # Fabric.js hook
+│   │   └── useCanvasKeyboard.ts
+│   ├── lib/
+│   │   ├── auth.ts             # NextAuth config
+│   │   ├── connectDB.ts        # MongoDB connection
+│   │   └── imagekit.ts         # ImageKit config
+│   └── models/                 # MongoDB schemas
+│
+└── ai-service/                  # FastAPI backend
+    ├── app/
+    │   ├── constants/          # Design system constants
+    │   │   ├── design_system.py
+    │   │   ├── text_styles.py
+    │   │   ├── fabric_elements.py
+    │   │   └── prompts.py
+    │   ├── graphs/             # LangGraph workflows
+    │   │   ├── nodes/          # Workflow nodes
+    │   │   │   ├── analysis/
+    │   │   │   ├── planning/
+    │   │   │   ├── generation/
+    │   │   │   └── building/
+    │   │   └── workflows/
+    │   │       ├── create_workflow.py
+    │   │       ├── resize_workflow.py
+    │   │       └── task_router.py
+    │   ├── models/             # Pydantic models
+    │   │   ├── canvas.py
+    │   │   ├── brand.py
+    │   │   ├── content.py
+    │   │   ├── image.py
+    │   │   └── state.py
+    │   ├── services/           # Business logic
+    │   │   ├── llm_service.py
+    │   │   ├── image_service.py
+    │   │   ├── canvas_builder.py
+    │   │   ├── layout_engine.py
+    │   │   ├── pixabay_service.py
+    │   │   └── imagekit_service.py
+    │   └── routes/             # API endpoints
+    │
+    └── main.py                 # FastAPI app
 ```
