@@ -123,17 +123,24 @@ cp .env.example .env.local
 # MongoDB
 MONGODB_URI=mongodb://localhost:27017/autocre8
 
+# Google OAuth
+GOOGLE_CLIENT_ID=
+GOOGLE_CLIENT_SECRET=
+
 # NextAuth
-NEXTAUTH_SECRET=your-secret-key-here
 NEXTAUTH_URL=http://localhost:3000
+NEXTAUTH_SECRET=your-super-secret-key-here-generate-it
+
+# FastAPI (ai-service endpoint)
+FASTAPI_URL=http://localhost:8000
 
 # ImageKit
 NEXT_PUBLIC_IMAGEKIT_PUBLIC_KEY=your_public_key
 NEXT_PUBLIC_IMAGEKIT_URL_ENDPOINT=https://ik.imagekit.io/your_id
 IMAGEKIT_PRIVATE_KEY=your_private_key
 
-# FastAPI
-FASTAPI_URL=http://localhost:8000
+# PIXABAY
+NEXT_PUBLIC_PIXABAY_KEY=53976040-1c3373e201e4d5f9d23322cce
 ```
 
 #### 3. Setup AI Service
@@ -154,6 +161,9 @@ pip install -r requirements.txt
 MONGODB_URI=mongodb+srv://.....
 MONGODB_DB_NAME=database_name
 
+# Frontend endpoint
+FRONTEND_URL=http://localhost:3000
+
 # OpenAI
 OPENAI_API_KEY=sk-...
 
@@ -162,6 +172,9 @@ ANTHROPIC_API_KEY=sk-ant-...
 
 # OpenRouter (Optional - Claude fallback)
 OPENROUTER_API_KEY=sk-or-...
+
+# Pixabay 
+PIXABAY_API_KEY=53976040-1c3373e201e4d5f9d23322cce
 
 # ImageKit
 IMAGEKIT_PRIVATE_KEY=private_...
