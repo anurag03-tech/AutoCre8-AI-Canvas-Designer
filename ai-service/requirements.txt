@@ -5,4 +5,4 @@ pydantic>=2.9.0
 langchain>=0.3.0
 langchain-core>=0.3.0
 langchain-google-genai>=2.0.0
-langchain-openai>=0.3.0   # <--- Added back
+langchain-openai>=0.3.0   

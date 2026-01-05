@@ -11,7 +11,6 @@ export const ROUTES = {
   PROJECT: "/project",
   BRAND: "/brand",
   PROFILE: "/profile",
-  CANVAS: "/canvas/create",
   AUTH: "/auth",
   LANDING: "/",
 } as const;
@@ -20,13 +19,7 @@ export const ROUTES = {
 export const ROUTE_GROUPS = {
   PUBLIC: [ROUTES.LANDING],
   AUTH: [ROUTES.AUTH],
-  PROTECTED: [
-    ROUTES.HOME,
-    ROUTES.PROJECT,
-    ROUTES.BRAND,
-    ROUTES.PROFILE,
-    ROUTES.CANVAS,
-  ],
+  PROTECTED: [ROUTES.HOME, ROUTES.PROJECT, ROUTES.BRAND, ROUTES.PROFILE],
 } as const;
 
 export const SIDEBAR_CONFIG = [
