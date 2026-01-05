@@ -1,6 +1,12 @@
-# 🎨 AutoCre8 - AI-Powered Design Platform
+# <img src="./frontend/src/app/favicon.ico" height="30"> AutoCre8 - AI-Powered Design Platform
 
 AutoCre8 is a professional canvas-based design platform with AI-powered design assistance. Create stunning graphics, social media posts, presentations, and more with intelligent layout suggestions and automated design improvements.
+
+## 🚀 Quick Links
+
+| 🔗 **Live Demo** | 🎥 **Video Demo** |
+|:---:|:---:|
+| [**autocre8.vercel.app**](https://autocre8.vercel.app) | [**Watch Demo**](https://drive.google.com/file/d/1TF4Ux4MLD4rMN88VrpKE7xVGRjODOUSX/view) |
 
 | |  |
 |:---:|:---:|
