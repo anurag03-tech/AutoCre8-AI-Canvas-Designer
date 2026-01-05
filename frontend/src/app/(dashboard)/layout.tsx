@@ -15,20 +15,28 @@ const Layout = ({ children }: { children: ReactNode }) => {
 
   return (
     <CanvasProvider>
-      <div className="flex flex-col h-screen">
+      <div className="flex flex-col h-screen overflow-hidden">
+        {/* Fixed Header */}
         {isCreatePage && (
-          <CanvasHeader
-            onToggleSidebar={() => setSidebarOpen(!sidebarOpen)}
-            isSidebarOpen={sidebarOpen}
-          />
+          <div className="shrink-0">
+            <CanvasHeader
+              onToggleSidebar={() => setSidebarOpen(!sidebarOpen)}
+              isSidebarOpen={sidebarOpen}
+            />
+          </div>
         )}
 
-        {/* 👇 fills remaining height after header */}
-        <div className="flex flex-1 min-h-0">
-          {showSidebar && <Sidebar collapsed={isCreatePage} />}
+        {/* Main Content Area */}
+        <div className="flex flex-1 min-h-0 overflow-hidden">
+          {/* Fixed Sidebar */}
+          {showSidebar && (
+            <div className="shrink-0 h-full">
+              <Sidebar collapsed={isCreatePage} />
+            </div>
+          )}
 
-          {/* 👇 child gets ONLY available height */}
-          <div className="flex-1 min-h-0">{children}</div>
+          {/* Scrollable Main Content */}
+          <main className="flex-1 overflow-y-auto bg-gray-50">{children}</main>
         </div>
       </div>
     </CanvasProvider>

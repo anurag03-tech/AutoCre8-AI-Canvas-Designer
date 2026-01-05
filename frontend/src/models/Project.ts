@@ -9,23 +9,18 @@ export interface IProjectAsset {
 }
 
 export interface IProjectGuidelines {
-  objective?: string; // What we're building
-  deliverables?: string[]; // What to create
-
-  // Design preferences for this project
-  preferredColors?: string[]; // Project-specific colors
-
-  notes?: string; // Additional notes
+  objective?: string;
+  deliverables?: string[];
+  preferredColors?: string[];
+  notes?: string;
 }
 
 export interface IProject extends Document {
   name: string;
   description?: string;
 
-  // Brand Association
   brand?: mongoose.Types.ObjectId;
 
-  // Project Guidelines
   guidelines?: IProjectGuidelines;
 
   // Shared Images

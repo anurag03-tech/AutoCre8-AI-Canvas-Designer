@@ -54,19 +54,6 @@ const Home = () => {
                 <ArrowRight className="w-5 h-5 ml-2 group-hover:translate-x-1 transition-transform" />
               </Button>
             </Link>
-            <Link
-              href="https://github.com/anurag03-tech/AutoCre8-AI-Canvas-Designer"
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              <Button
-                variant="outline"
-                size="lg"
-                className="h-14 px-8 text-lg border-2 border-zinc-200 dark:border-zinc-700 hover:bg-zinc-50 dark:hover:bg-zinc-800 rounded-2xl font-semibold cursor-pointer transition-all duration-300 hover:scale-105"
-              >
-                GitHub
-              </Button>
-            </Link>
           </div>
         </div>
 

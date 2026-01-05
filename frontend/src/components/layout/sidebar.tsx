@@ -31,14 +31,6 @@ const Sidebar = ({ collapsed = false }: { collapsed?: boolean }) => {
           ))}
         </div>
       </div>
-
-      <SidebarTabs
-        title="Profile"
-        Icon={User}
-        href={ROUTES.PROFILE}
-        isActive={pathName === ROUTES.PROFILE}
-        collapsed={collapsed}
-      />
     </div>
   );
 };

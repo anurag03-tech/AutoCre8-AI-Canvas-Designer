@@ -209,7 +209,7 @@ const ProjectPage = () => {
               <button
                 key={tab.key}
                 onClick={() => setFilterTab(tab.key as any)}
-                className={`px-4 py-2 text-sm font-medium transition-all border-b-2 ${
+                className={`px-4 py-2 text-sm font-medium transition-all border-b-2 cursor-pointer ${
                   filterTab === tab.key
                     ? "border-blue-600 text-blue-600"
                     : "border-transparent text-gray-600 hover:text-gray-900"
@@ -217,7 +217,7 @@ const ProjectPage = () => {
               >
                 {tab.label}
                 {tab.count > 0 && (
-                  <span className="ml-2 px-2 py-0.5 text-xs rounded-full bg-gray-100 text-gray-600">
+                  <span className="ml-2 px-2 py-0.5 text-xs rounded-full bg-gray-100 text-gray-600 ">
                     {tab.count}
                   </span>
                 )}
@@ -245,7 +245,7 @@ const ProjectPage = () => {
             {!searchQuery && (
               <Button
                 onClick={() => setShowModal(true)}
-                className="bg-blue-600 hover:bg-blue-700"
+                className="bg-blue-600 hover:bg-blue-700 cursor-pointer"
               >
                 <Plus className="w-4 h-4 mr-2" />
                 Create Project
@@ -264,17 +264,20 @@ const ProjectPage = () => {
                   onClick={() => router.push(`/project/${p._id}`)}
                 >
                   {/* Thumbnail */}
-                  <div className="relative aspect-video bg-gradient-to-br from-blue-50 to-blue-100 flex items-center justify-center">
-                    {p.brand ? (
-                      <div className="relative w-16 h-16">
+
+                  <div className="relative aspect-video bg-gradient-to-br from-blue-50 to-blue-100 flex items-center justify-center overflow-hidden">
+                    {/* Folder Icon - Large and centered */}
+                    <FolderOpen className="w-16 h-16 text-blue-400" />
+
+                    {/* Brand Logo - Small icon in bottom-right (only if brand exists) */}
+                    {p.brand && (
+                      <div className="absolute bottom-3 right-3 w-12 h-12 bg-white rounded-lg p-1.5 shadow-md border border-gray-200">
                         <img
                           src={p.brand.logoUrl}
                           alt={p.brand.name}
                           className="w-full h-full object-contain"
                         />
                       </div>
-                    ) : (
-                      <FolderOpen className="w-12 h-12 text-blue-400" />
                     )}
 
                     {/* Delete Button - Only for owned projects */}
@@ -284,7 +287,7 @@ const ProjectPage = () => {
                           e.stopPropagation();
                           handleDelete(p._id);
                         }}
-                        className="absolute top-2 right-2 p-1.5 bg-white rounded-md shadow-sm opacity-0 group-hover:opacity-100 hover:bg-red-50 transition-all"
+                        className="absolute top-2 right-2 p-1.5 bg-white rounded-md shadow-sm opacity-0 group-hover:opacity-100 hover:bg-red-50 transition-all z-10 cursor-pointer"
                       >
                         <Trash2 className="w-4 h-4 text-red-600" />
                       </button>
@@ -381,7 +384,7 @@ const ProjectPage = () => {
                   </p>
                 </div>
 
-                <div className="flex gap-3 pt-2">
+                <div className="flex gap-3 pt-2 cursor-pointer">
                   <Button
                     type="button"
                     variant="outline"
@@ -398,7 +401,7 @@ const ProjectPage = () => {
                   <Button
                     type="submit"
                     disabled={creating}
-                    className="flex-1 bg-blue-600 hover:bg-blue-700"
+                    className="flex-1 bg-blue-600 hover:bg-blue-700 cursor-pointer"
                   >
                     {creating ? "Creating..." : "Create"}
                   </Button>

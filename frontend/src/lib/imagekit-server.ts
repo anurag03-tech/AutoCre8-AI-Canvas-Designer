@@ -1,4 +1,4 @@
-//  SERVER-SIDE ONLY - Only import this in API routes
+//  SERVER-SIDE ONLY
 
 import ImageKit from "imagekit";
 

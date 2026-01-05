@@ -6,7 +6,7 @@ import Link from "next/link";
 const Logo = () => {
   const { LOGO_TEXT, FAVICON } = ASSETS;
   return (
-    <Link href="/">
+    <Link href="/home">
       <div className="flex flex-row gap-2 items-center">
         <div className="w-14 h-12 relative">
           <Image src={FAVICON} fill alt="Favicon" className="object-cover" />

@@ -35,23 +35,19 @@ export interface ICanvas extends Document {
     height: number;
   };
 
-  // Unit
   unit: "px" | "in" | "cm" | "mm";
 
   // Template Type
   template?: keyof typeof CANVAS_TEMPLATES;
 
-  // Owner
   owner: mongoose.Types.ObjectId;
 
   // Version Control
   version: number;
   parentCanvas?: mongoose.Types.ObjectId;
 
-  // ✅ NEW: Compliance Rules (raw text, no formatting)
   complianceRules?: string;
 
-  // ✅ NEW: Last Validation Results
   lastValidation?: {
     timestamp: Date;
     passed: boolean;
@@ -143,13 +139,11 @@ const CanvasSchema = new Schema<ICanvas>(
       ref: "Canvas",
     },
 
-    // ✅ NEW: Compliance Rules (stored as raw text)
     complianceRules: {
       type: String,
       default: "",
     },
 
-    // ✅ NEW: Last Validation Results
     lastValidation: {
       timestamp: Date,
       passed: Boolean,

@@ -39,11 +39,10 @@ AutoCre8 is a professional canvas-based design platform with AI-powered design a
 ### 🤖 AI Capabilities
 
 - **Smart Layout Planning** - AI analyzes content and creates professional layouts
-- **Vision-Powered Image Selection** - Automatically picks best images from gallery
 - **Brand-Aware Design** - Respects brand colors, fonts, and guidelines
 - **Intelligent Resize** - Adapts designs to different canvas sizes
 - **Content Generation** - Creates headlines, subheadlines, and CTAs
-- **Multi-Model AI System** - Powered by GPT-4o, Claude Sonnet 4, and Vision API
+- **Multi-Model AI System** - Powered by OpenAI, Gemini
 
 ### 🎨 Image Features
 
@@ -71,19 +70,8 @@ AutoCre8 is a professional canvas-based design platform with AI-powered design a
 
 ```
 ├── FastAPI (Python)
-├── LangGraph (Workflow Orchestration)
 ├── LangChain (LLM Integration)
 ├── Pydantic (Data Validation)
-└── httpx (Async HTTP)
-```
-
-#### AI Models
-
-```
-├── GPT-4o (Vision, Content Generation)
-├── GPT-4o-mini (Simple Tasks)
-├── Claude Sonnet 4 (Complex Layout Planning)
-└── OpenRouter (Claude Fallback)
 ```
 
 #### Services
@@ -101,7 +89,7 @@ AutoCre8 is a professional canvas-based design platform with AI-powered design a
 - Node.js 20+
 - Python 3.10+
 - MongoDB
-- API Keys (OpenAI, Anthropic/OpenRouter, ImageKit, pixabay)
+- API Keys (OpenAI, Gemini, ImageKit, pixabay)
 
 ### Installation
 
@@ -132,12 +120,16 @@ MONGODB_URI=mongodb://localhost:27017/autocre8
 GOOGLE_CLIENT_ID=
 GOOGLE_CLIENT_SECRET=
 
+# OpenAI
+OPENAI_API_KEY=sk-proj-....
+
 # NextAuth
 NEXTAUTH_URL=http://localhost:3000
 NEXTAUTH_SECRET=your-super-secret-key-here-generate-it
 
 # FastAPI (ai-service endpoint)
 FASTAPI_URL=http://localhost:8000
+FASTAPI_API_KEY=autocre8-secret-key-2026
 
 # ImageKit
 NEXT_PUBLIC_IMAGEKIT_PUBLIC_KEY=your_public_key
@@ -145,7 +137,7 @@ NEXT_PUBLIC_IMAGEKIT_URL_ENDPOINT=https://ik.imagekit.io/your_id
 IMAGEKIT_PRIVATE_KEY=your_private_key
 
 # PIXABAY
-NEXT_PUBLIC_PIXABAY_KEY=53976040-1c3373e201e4d5f9d23322cce
+NEXT_PUBLIC_PIXABAY_KEY=5397604
 ```
 
 #### 3. Setup AI Service
@@ -222,104 +214,4 @@ uvicorn app.main:app --reload --port 8000
 "Make it more modern and minimal"
 "Add vibrant colors and improve hierarchy"
 "Resize this to Instagram story format"
-```
-
-## 🤖 AI Workflows
-
-### Create New Design Workflow
-
-```
-User Prompt
-    ↓
-Task Classification (create_new/improve/resize)
-    ↓
-Analyze Intent (platform, type, product, goal)
-    ↓
-Analyze Brand (colors, fonts, personality)
-    ↓
-Plan Content (headline, subheadline, CTA)
-    ↓
-Plan Image Needs (use gallery or not)
-    ↓
-Select Images (Vision API batch analysis)
-    ↓
-Plan Layout (AI chooses positions, sizes, styles)
-    ↓
-Build Canvas (Convert to Fabric.js objects)
-    ↓
-Finalize & Return
-```
-
-### Resize Workflow
-
-```
-User Prompt + Current Canvas + Screenshot
-    ↓
-Analyze Aspect Ratio Change
-    ↓
-AI Repositions Elements (not just scaling)
-    ↓
-Returns New Canvas Data
-```
-
-## 📁 Project Structure
-
-```
-autocre8/
-├── frontend/
-│   ├── app/
-│   │   ├── (root)/             # Landing & Authentication pages
-│   │   ├── (dashboard)/        # Dashboard & canvas
-│   │   └── api/                # API routes
-│   ├── components/
-│   │   ├── layout/             # Layout components
-│   │   │   ├── CanvasHeader.tsx
-│   │   │   ├── CanvasToolbox.tsx
-│   │   │   └── toolbar/        # Toolbar panels
-│   │   ├── shared/             # Shared components
-│   │   └── ui/                 # shadcn/ui components
-│   ├── contexts/
-│   │   └── CanvasContext.tsx   # Global canvas state
-│   ├── hooks/
-│   │   ├── useFabricCanvas.ts  # Fabric.js hook
-│   │   └── useCanvasKeyboard.ts
-│   ├── lib/
-│   │   ├── auth.ts             # NextAuth config
-│   │   ├── connectDB.ts        # MongoDB connection
-│   │   └── imagekit.ts         # ImageKit config
-│   └── models/                 # MongoDB schemas
-│
-└── ai-service/                  # FastAPI backend
-    ├── app/
-    │   ├── constants/          # Design system constants
-    │   │   ├── design_system.py
-    │   │   ├── text_styles.py
-    │   │   ├── fabric_elements.py
-    │   │   └── prompts.py
-    │   ├── graphs/             # LangGraph workflows
-    │   │   ├── nodes/          # Workflow nodes
-    │   │   │   ├── analysis/
-    │   │   │   ├── planning/
-    │   │   │   ├── generation/
-    │   │   │   └── building/
-    │   │   └── workflows/
-    │   │       ├── create_workflow.py
-    │   │       ├── resize_workflow.py
-    │   │       └── task_router.py
-    │   ├── models/             # Pydantic models
-    │   │   ├── canvas.py
-    │   │   ├── brand.py
-    │   │   ├── content.py
-    │   │   ├── image.py
-    │   │   └── state.py
-    │   ├── services/           # Business logic
-    │   │   ├── llm_service.py
-    │   │   ├── image_service.py
-    │   │   ├── canvas_builder.py
-    │   │   ├── layout_engine.py
-    │   │   ├── pixabay_service.py
-    │   │   └── imagekit_service.py
-    │   └── routes/             # API endpoints
-    │
-    └── main.py                 # FastAPI app
 ```

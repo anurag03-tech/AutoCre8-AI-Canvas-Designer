@@ -2,16 +2,13 @@
 import { ChatOpenAI } from "@langchain/openai";
 import { z } from "zod";
 
-// Initialize OpenAI model
 const model = new ChatOpenAI({
   modelName: "gpt-4o",
   temperature: 0.2,
   openAIApiKey: process.env.OPENAI_API_KEY,
 });
 
-// ==========================================
 // VALIDATION SCHEMAS (Structured Output)
-// ==========================================
 
 const ValidationIssueSchema = z.object({
   rule: z.string().describe("The compliance rule being checked"),
@@ -30,9 +27,7 @@ const ValidationResponseSchema = z.object({
 export type ValidationIssue = z.infer<typeof ValidationIssueSchema>;
 export type ValidationResponse = z.infer<typeof ValidationResponseSchema>;
 
-// ==========================================
 // AUTO-FIX TYPES (Manual Parsing)
-// ==========================================
 
 export interface AutoFixChange {
   element: string;
@@ -53,9 +48,7 @@ export interface AutoFixResponse {
   unfixableIssues: UnfixableIssue[];
 }
 
-// ==========================================
 // VALIDATION FUNCTION (Structured Output)
-// ==========================================
 
 export async function validateCanvasCompliance(
   complianceRules: string,
@@ -111,9 +104,7 @@ Validate the canvas against these rules. For each issue, provide a suggestion (o
   }
 }
 
-// ==========================================
 // AUTO-FIX FUNCTION (Manual JSON Parsing)
-// ==========================================
 
 export async function autoFixCanvasCompliance(
   complianceRules: string,
@@ -121,7 +112,7 @@ export async function autoFixCanvasCompliance(
   canvasScreenshot?: string
 ): Promise<AutoFixResponse> {
   try {
-    // ✅ Use regular model (no structured output for auto-fix)
+    // Use regular model (no structured output for auto-fix)
     const systemPrompt = `You are a design auto-fix AI. Your job is to automatically fix canvas designs to comply with given rules.
 
 CRITICAL INSTRUCTIONS:
@@ -222,7 +213,7 @@ Fix all possible compliance issues and return the corrected canvas in the JSON f
       },
     ];
 
-    console.log("🔧 Calling LLM for auto-fix...");
+    console.log("Calling LLM for auto-fix...");
 
     // Call model without structured output
     const response = await model.invoke(messages);
@@ -248,7 +239,7 @@ Fix all possible compliance issues and return the corrected canvas in the JSON f
       throw new Error(`Invalid JSON response from LLM: ${parseError}`);
     }
 
-    console.log("✅ Auto-fix complete:", {
+    console.log(" Auto-fix complete:", {
       fixed: result.fixed,
       changesCount: result.changesMade?.length || 0,
       unfixableCount: result.unfixableIssues?.length || 0,

@@ -1,4 +1,4 @@
-// Base endpoint (still useful if you ever need to build URLs from paths)
+// Base endpoint
 export const imagekitUrlEndpoint =
   process.env.NEXT_PUBLIC_IMAGEKIT_URL_ENDPOINT || "";
 
@@ -22,7 +22,7 @@ function appendTransform(url: string, transform: string) {
 
 // Transformation helpers (pure URL manipulation, no SDK needed)
 export const imagekitTransformations = {
-  // ✅ Background removal (cheap ImageKit AI: e-bgremove)
+  //  Background removal (cheap ImageKit AI: e-bgremove)
   // For remove.bg quality instead, switch to "e-removedotbg".
   removeBg: (imageUrl: string) => {
     return appendTransform(imageUrl, "e-bgremove");

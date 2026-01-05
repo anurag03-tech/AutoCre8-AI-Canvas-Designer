@@ -1,76 +1,39 @@
 // models/Brand.ts
 import mongoose, { Schema, Document } from "mongoose";
-import { IBrandGuidelines, BrandGuidelinesSchema } from "./BrandGuidelines";
 
 export interface IBrand extends Document {
-  // User Input
   name: string;
-  logoUrl: string;
+  logoUrl?: string;
   tagline?: string;
   description?: string;
-  industry?: string;
 
-  // AI-Generated Guidelines (imported)
-  guidelines?: IBrandGuidelines;
+  // Visual Identity Fields
+  brandIdentity?: string;
+  fontType?: string;
+  colorTheme?: string;
+  backgroundImageUrl?: string;
 
-  // Optional Metadata
-  keywords?: string[];
-  values?: string[];
-  mission?: string;
-  vision?: string;
-
-  // Access Control
   owner: mongoose.Types.ObjectId;
   viewers: mongoose.Types.ObjectId[];
-
-  // Projects
-  projects?: mongoose.Types.ObjectId[];
-
   createdAt: Date;
   updatedAt: Date;
 }
 
 const BrandSchema = new Schema<IBrand>(
   {
-    name: {
-      type: String,
-      required: true,
-      trim: true,
-    },
-    logoUrl: {
-      type: String,
-      required: true,
-    },
+    name: { type: String, required: true, trim: true },
+    logoUrl: { type: String, required: false },
     tagline: String,
     description: String,
-    industry: String,
 
-    // Import guidelines schema
-    guidelines: BrandGuidelinesSchema,
+    // Visual Identity
+    brandIdentity: String,
+    fontType: String,
+    colorTheme: String,
+    backgroundImageUrl: String,
 
-    keywords: [String],
-    values: [String],
-    mission: String,
-    vision: String,
-
-    owner: {
-      type: Schema.Types.ObjectId,
-      ref: "User",
-      required: true,
-    },
-    viewers: [
-      {
-        type: Schema.Types.ObjectId,
-        ref: "User",
-      },
-    ],
-
-    projects: [
-      {
-        type: Schema.Types.ObjectId,
-        ref: "Project",
-      },
-    ],
+    owner: { type: Schema.Types.ObjectId, ref: "User", required: true },
+    viewers: [{ type: Schema.Types.ObjectId, ref: "User" }],
   },
   { timestamps: true }
 );

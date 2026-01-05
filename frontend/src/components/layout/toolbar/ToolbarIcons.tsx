@@ -9,7 +9,6 @@ import {
   Layers,
   Palette,
   Square,
-  Users,
   Tag,
 } from "lucide-react";
 import { ToolType } from "../canvasToolbox";
@@ -28,7 +27,7 @@ const ToolbarIcons: React.FC<Props> = ({ activePanel, onPanelToggle }) => {
     <button
       key={panel}
       onClick={() => onPanelToggle(panel)}
-      className={`flex flex-col items-center gap-1 p-1 py-3 cursor-pointer rounded-lg transition-all duration-200 hover:bg-gray-100 ${
+      className={`flex flex-col items-center gap-1 p-1 py-2 cursor-pointer rounded-lg transition-all duration-200 hover:bg-gray-100 ${
         activePanel === panel ? "bg-indigo-50 text-indigo-600" : "text-gray-600"
       }`}
     >
@@ -52,16 +51,16 @@ const ToolbarIcons: React.FC<Props> = ({ activePanel, onPanelToggle }) => {
   );
 
   return (
-    <div className="flex flex-col items-stretch py-2 px-2 bg-white border-r border-gray-200 gap-1 min-w-[80px]">
+    <div className="flex flex-col items-stretch py-1 px-2 bg-white border-r border-gray-200 gap-1 min-w-[80px]">
       {iconButton("layers", "Layers", Layers)}
       {iconButton("elements", "Elements", Square)}
       {iconButton("text", "Text", Type)}
-      {iconButton("images", "Images", Image)}
       {iconButton("background", "Background", Palette)}
+      {iconButton("images", "Images", Image)}
+      {/* {iconButton("assets", "Assets", Folder)} */}
+      <div className="h-px bg-gray-200 mx-2" />
 
-      <div className="h-px bg-gray-200 my-2 mx-2" />
-
-      {iconButton("ai", "AI Assistant", Sparkles)}
+      {iconButton("ai assistant", "AI Assistant", Sparkles)}
       {iconButton("compliance", "Compliance", Tag)}
     </div>
   );

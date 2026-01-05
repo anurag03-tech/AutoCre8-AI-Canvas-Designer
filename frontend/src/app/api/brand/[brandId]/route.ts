@@ -1,13 +1,11 @@
-// frontend/src/app/api/brand/[brandId]/route.ts
-
+// app/api/brand/[brandId]/route.ts
 import { NextRequest, NextResponse } from "next/server";
 import { requireAuth } from "@/lib/auth";
 import connectDB from "@/lib/connectDB";
-import mongoose from "mongoose";
-// Import all models from index to ensure proper registration
-import { User, Brand, Canvas, Project } from "@/models";
+import Brand from "@/models/Brand";
+import User from "@/models/User";
 
-// GET - Get brand by ID
+// GET - Get brand details
 export async function GET(
   req: NextRequest,
   { params }: { params: Promise<{ brandId: string }> }
@@ -19,8 +17,9 @@ export async function GET(
 
     await connectDB();
 
-    // Fetch brand without population first
-    const brand = await Brand.findById(brandId);
+    const brand = await Brand.findById(brandId)
+      .populate("owner", "name email image")
+      .populate("viewers", "name email image");
 
     if (!brand) {
       return NextResponse.json(
@@ -29,46 +28,23 @@ export async function GET(
       );
     }
 
-    // Check access BEFORE populating (owner is ObjectId here)
     const userId = auth.user?.id;
-    const isOwner = brand.owner.toString() === userId;
-    const isViewer = brand.viewers?.some((v: any) => v.toString() === userId);
-    const hasAccess = isOwner || isViewer;
+    const isOwner = brand.owner._id.toString() === userId;
+    const isViewer = brand.viewers?.some(
+      (v: any) => v._id.toString() === userId
+    );
 
-    console.log("🔍 Access Check:", {
-      userId,
-      ownerId: brand.owner.toString(),
-      isOwner,
-      isViewer,
-      hasAccess,
-    });
-
-    if (!hasAccess) {
+    if (!isOwner && !isViewer) {
       return NextResponse.json(
         { success: false, error: "Access denied" },
         { status: 403 }
       );
     }
 
-    // NOW populate after access check passes
-    await brand.populate("owner", "name email image");
-    await brand.populate("viewers", "name email image");
-
-    // Only populate projects if you have a Project model
-    // If you don't have a Project model yet, comment this out
-    // if (brand.projects && brand.projects.length > 0) {
-    //   await brand.populate("projects");
-    // }
-
-    return NextResponse.json({
-      success: true,
-      brand,
-      isOwner,
-    });
+    return NextResponse.json({ success: true, brand, isOwner });
   } catch (error: any) {
-    console.error("❌ Error fetching brand:", error);
     return NextResponse.json(
-      { success: false, error: error.message || "Failed to fetch brand" },
+      { success: false, error: error.message },
       { status: 500 }
     );
   }
@@ -81,106 +57,86 @@ export async function PATCH(
 ) {
   try {
     const { brandId } = await params;
-
     const auth = await requireAuth(req);
     if (!auth.authorized) return auth.response;
 
     await connectDB();
-
     const brand = await Brand.findById(brandId);
 
-    if (!brand) {
+    if (!brand)
       return NextResponse.json(
-        { success: false, error: "Brand not found" },
+        { success: false, error: "Not found" },
         { status: 404 }
       );
-    }
-
-    // Only owner can update
     if (brand.owner.toString() !== auth.user?.id) {
       return NextResponse.json(
-        { success: false, error: "Only owner can update brand" },
+        { success: false, error: "Unauthorized" },
         { status: 403 }
       );
     }
 
-    const updates = await req.json();
+    const body = await req.json();
+    console.log("Updating Brand:", brandId, body);
 
-    // Update allowed fields
+    // Explicitly defining allowed fields for update
     const allowedFields = [
       "name",
       "logoUrl",
       "tagline",
       "description",
-      "industry",
-      "keywords",
-      "values",
-      "mission",
-      "vision",
+      "brandIdentity",
+      "fontType",
+      "colorTheme",
+      "backgroundImageUrl",
     ];
 
     allowedFields.forEach((field) => {
-      if (updates[field] !== undefined) {
-        brand[field] = updates[field];
+      // Allow empty strings to clear values, but ignore undefined
+      if (body[field] !== undefined) {
+        brand[field] = body[field];
       }
     });
 
     await brand.save();
 
-    return NextResponse.json({
-      success: true,
-      brand,
-      message: "Brand updated successfully",
-    });
+    return NextResponse.json({ success: true, brand });
   } catch (error: any) {
-    console.error("Error updating brand:", error);
+    console.error("Update Error:", error);
     return NextResponse.json(
-      { success: false, error: error.message || "Failed to update brand" },
+      { success: false, error: error.message },
       { status: 500 }
     );
   }
 }
 
-// DELETE - Delete brand
 export async function DELETE(
   req: NextRequest,
   { params }: { params: Promise<{ brandId: string }> }
 ) {
   try {
     const { brandId } = await params;
-
     const auth = await requireAuth(req);
     if (!auth.authorized) return auth.response;
 
     await connectDB();
-
     const brand = await Brand.findById(brandId);
 
-    if (!brand) {
+    if (!brand)
       return NextResponse.json(
         { success: false, error: "Brand not found" },
         { status: 404 }
       );
-    }
-
-    // Only owner can delete
-    if (brand.owner.toString() !== auth.user?.id) {
+    if (brand.owner.toString() !== auth.user?.id)
       return NextResponse.json(
-        { success: false, error: "Only owner can delete brand" },
+        { success: false, error: "Forbidden" },
         { status: 403 }
       );
-    }
 
     await Brand.findByIdAndDelete(brandId);
-
-    return NextResponse.json({
-      success: true,
-      message: "Brand deleted successfully",
-    });
+    return NextResponse.json({ success: true, message: "Deleted" });
   } catch (error: any) {
-    console.error("Error deleting brand:", error);
     return NextResponse.json(
-      { success: false, error: error.message || "Failed to delete brand" },
+      { success: false, error: error.message },
       { status: 500 }
     );
   }

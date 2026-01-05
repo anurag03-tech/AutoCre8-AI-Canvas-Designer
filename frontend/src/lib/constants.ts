@@ -1,5 +1,5 @@
 // lib/constants.ts
-import { Home, FolderKanban, BadgeCent } from "lucide-react";
+import { Home, FolderKanban, BadgeCent, User } from "lucide-react";
 
 export const ASSETS = {
   LOGO_TEXT: "/logoText.png",
@@ -45,9 +45,14 @@ export const SIDEBAR_CONFIG = [
     Icon: BadgeCent,
     href: ROUTES.BRAND,
   },
+  {
+    title: "Profile",
+    Icon: User,
+    href: ROUTES.PROFILE,
+  },
 ] as const;
 
-// ✅ CANVAS SIZE TEMPLATES (SINGLE SOURCE OF TRUTH)
+// CANVAS SIZE TEMPLATES
 export const CANVAS_TEMPLATES = {
   "instagram-post": {
     width: 1080,

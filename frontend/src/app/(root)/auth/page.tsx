@@ -44,7 +44,7 @@ const Auth = () => {
           <Button
             onClick={handleGoogleAuth}
             disabled={loading}
-            className="w-full h-14 bg-white hover:bg-gray-50 text-gray-800 border-2 border-gray-300 font-semibold text-base shadow-sm hover:shadow-md transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+            className="w-full h-14 bg-white hover:bg-gray-50 text-gray-800 border-2 border-gray-300 font-semibold text-base shadow-sm hover:shadow-md transition-all disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
           >
             {loading ? (
               <span className="flex items-center justify-center">
@@ -96,6 +96,7 @@ const Auth = () => {
           </Button>
 
           {/* Benefits */}
+          {/* Benefits */}
           <div className="mt-8 pt-6 border-t border-gray-100">
             <p className="text-xs text-gray-500 text-center mb-4 font-medium">
               What you&apos;ll get:
@@ -113,7 +114,7 @@ const Auth = () => {
                     clipRule="evenodd"
                   />
                 </svg>
-                <span>Save and access your projects</span>
+                <span>AI-powered design generation & editing</span>
               </div>
               <div className="flex items-center gap-3">
                 <svg
@@ -127,7 +128,7 @@ const Auth = () => {
                     clipRule="evenodd"
                   />
                 </svg>
-                <span>Cloud storage & sync across devices</span>
+                <span>Smart canvas resizing with AI variations</span>
               </div>
               <div className="flex items-center gap-3">
                 <svg
@@ -141,7 +142,21 @@ const Auth = () => {
                     clipRule="evenodd"
                   />
                 </svg>
-                <span>Premium AI-powered templates</span>
+                <span>Brand compliance checking & validation</span>
+              </div>
+              <div className="flex items-center gap-3">
+                <svg
+                  className="w-5 h-5 text-green-500 shrink-0"
+                  fill="currentColor"
+                  viewBox="0 0 20 20"
+                >
+                  <path
+                    fillRule="evenodd"
+                    d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
+                    clipRule="evenodd"
+                  />
+                </svg>
+                <span>Multi-format export & cloud storage</span>
               </div>
             </div>
           </div>

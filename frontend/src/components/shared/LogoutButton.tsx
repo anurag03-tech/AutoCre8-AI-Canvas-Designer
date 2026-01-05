@@ -25,7 +25,7 @@ const LogoutButton = () => {
       onClick={handleLogout}
       disabled={loading}
       variant="outline"
-      className="border-red-200 text-red-600 hover:bg-red-50 hover:border-red-300"
+      className="border-red-200 text-red-600 hover:bg-red-50 hover:border-red-300 cursor-pointer"
     >
       {loading ? (
         <span className="flex items-center">

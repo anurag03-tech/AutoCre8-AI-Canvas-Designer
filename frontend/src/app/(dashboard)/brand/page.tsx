@@ -3,23 +3,21 @@
 import React, { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
 import { Plus, Building2, Users, Trash2, Edit } from "lucide-react";
 
 interface Brand {
   _id: string;
   name: string;
-  logoUrl: string;
+  logoUrl?: string;
   tagline?: string;
   description?: string;
-  industry?: string;
   owner?: {
     _id: string;
     name: string;
-    email: string;
     image: string;
   };
-  viewers?: any[];
-  createdAt: string;
   updatedAt: string;
 }
 
@@ -83,7 +81,7 @@ const BrandPage = () => {
           <div>
             <h1 className="text-3xl font-bold text-gray-900">My Brands</h1>
             <p className="text-gray-600 mt-1">
-              Manage your brand identities and guidelines
+              Manage your brand identities and assets
             </p>
           </div>
           <Button
@@ -95,7 +93,7 @@ const BrandPage = () => {
           </Button>
         </div>
 
-        {/* Owned Brands */}
+        {/* Owned Brands Section */}
         <div className="mb-12">
           <div className="flex items-center gap-2 mb-4">
             <Building2 className="w-5 h-5 text-indigo-600" />
@@ -111,7 +109,7 @@ const BrandPage = () => {
                 No brands yet
               </h3>
               <p className="text-gray-600 mb-6">
-                Create your first brand to get started with AI-powered design
+                Create your first brand to get started
               </p>
               <Button
                 onClick={() => setShowCreateModal(true)}
@@ -136,7 +134,7 @@ const BrandPage = () => {
           )}
         </div>
 
-        {/* Shared Brands */}
+        {/* Shared Brands Section (RESTORED) */}
         {sharedBrands.length > 0 && (
           <div>
             <div className="flex items-center gap-2 mb-4">
@@ -187,73 +185,61 @@ const BrandCard = ({
   onEdit: () => void;
 }) => {
   return (
-    <div className="bg-white rounded-xl shadow-sm border border-gray-200 hover:shadow-lg transition-all overflow-hidden group">
+    <div className="bg-white rounded-xl shadow-sm border border-gray-200 hover:shadow-lg transition-all overflow-hidden group flex flex-col h-full">
       {/* Logo Section */}
-      <div className="h-40 bg-gradient-to-br from-indigo-50 to-purple-50 flex items-center justify-center relative">
-        <div className="relative w-24 h-24 rounded-lg overflow-hidden shadow-md">
-          <img
-            src={brand.logoUrl}
-            alt={brand.name}
-            className="w-full h-full object-cover"
-          />
+      <div className="h-40 bg-gradient-to-br from-gray-50 to-gray-100 flex items-center justify-center relative border-b border-gray-100">
+        <div className="relative w-24 h-24 rounded-lg bg-white shadow-sm flex items-center justify-center overflow-hidden">
+          {brand.logoUrl ? (
+            <img
+              src={brand.logoUrl}
+              alt={brand.name}
+              className="w-full h-full object-contain"
+            />
+          ) : (
+            <Building2 className="w-10 h-10 text-gray-300" />
+          )}
         </div>
         {!isOwner && brand.owner && (
-          <div className="absolute top-3 right-3 bg-purple-100 text-purple-700 px-2 py-1 rounded-full text-xs font-medium">
-            Shared by {brand.owner.name}
+          <div className="absolute top-3 right-3 bg-purple-100 text-purple-700 px-2 py-1 rounded-full text-xs font-medium flex items-center gap-1">
+            <span className="w-1.5 h-1.5 rounded-full bg-purple-500" />
+            {brand.owner.name}
           </div>
         )}
       </div>
 
       {/* Content Section */}
-      <div className="p-6">
+      <div className="p-6 flex-1 flex flex-col">
         <h3 className="text-xl font-bold text-gray-900 mb-1">{brand.name}</h3>
-        {brand.tagline && (
-          <p className="text-sm text-gray-600 mb-3">{brand.tagline}</p>
-        )}
-        {brand.description && (
-          <p className="text-sm text-gray-500 mb-4 line-clamp-2">
-            {brand.description}
-          </p>
-        )}
+        <p className="text-sm text-gray-500 mb-4 line-clamp-1">
+          {brand.tagline || "No tagline set"}
+        </p>
 
-        {brand.industry && (
-          <div className="inline-block bg-gray-100 text-gray-700 px-3 py-1 rounded-full text-xs font-medium mb-4">
-            {brand.industry}
-          </div>
-        )}
-
-        {/* Actions */}
-        <div className="flex items-center gap-2 pt-4 border-t border-gray-100">
+        <div className="mt-auto pt-4 border-t border-gray-100 flex gap-2">
           <Button
             onClick={onEdit}
-            className="flex-1 bg-indigo-50 text-indigo-700 hover:bg-indigo-100"
+            className="flex-1 bg-indigo-50 text-indigo-700 hover:bg-indigo-100 hover:text-indigo-800"
+            variant="ghost"
           >
             <Edit className="w-4 h-4 mr-2" />
-            {isOwner ? "Manage" : "View"}
+            {isOwner ? "Manage" : "View Details"}
           </Button>
 
-          {isOwner && (
-            <>
-              <Button
-                onClick={onDelete}
-                className="bg-red-50 text-red-700 hover:bg-red-100"
-              >
-                <Trash2 className="w-4 h-4" />
-              </Button>
-            </>
+          {isOwner && onDelete && (
+            <Button
+              onClick={onDelete}
+              className="bg-red-50 text-red-700 hover:bg-red-100 hover:text-red-800 px-3"
+              variant="ghost"
+            >
+              <Trash2 className="w-4 h-4" />
+            </Button>
           )}
-        </div>
-
-        {/* Meta */}
-        <div className="mt-4 text-xs text-gray-400">
-          Updated {new Date(brand.updatedAt).toLocaleDateString()}
         </div>
       </div>
     </div>
   );
 };
 
-// Create Brand Modal Component
+// Updated Create Brand Modal with TextAreas
 const CreateBrandModal = ({
   onClose,
   onSuccess,
@@ -267,13 +253,15 @@ const CreateBrandModal = ({
     logoUrl: "",
     tagline: "",
     description: "",
-    industry: "",
+    brandIdentity: "",
+    fontType: "",
+    colorTheme: "",
+    backgroundImageUrl: "",
   });
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
-
     try {
       const response = await fetch("/api/brand/create", {
         method: "POST",
@@ -298,118 +286,145 @@ const CreateBrandModal = ({
 
   return (
     <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-      <div className="bg-white rounded-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto">
-        <div className="p-6 border-b border-gray-200">
+      <div className="bg-white rounded-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto p-6">
+        <div className="mb-6">
           <h2 className="text-2xl font-bold text-gray-900">Create New Brand</h2>
-          <p className="text-gray-600 mt-1">
-            Add your brand details to generate AI-powered guidelines
+          <p className="text-gray-500 text-sm mt-1">
+            Define your brand identity to streamline your designs.
           </p>
         </div>
 
-        <form onSubmit={handleSubmit} className="p-6 space-y-6">
-          {/* Brand Name */}
-          <div>
-            <label className="block text-sm font-semibold text-gray-900 mb-2">
-              Brand Name *
-            </label>
-            <input
-              type="text"
-              required
-              value={formData.name}
-              onChange={(e) =>
-                setFormData({ ...formData, name: e.target.value })
-              }
-              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
-              placeholder="AutoCre8"
-            />
+        <form onSubmit={handleSubmit} className="space-y-5">
+          <div className="grid grid-cols-2 gap-4">
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                Brand Name *
+              </label>
+              <Input
+                required
+                value={formData.name}
+                onChange={(e) =>
+                  setFormData({ ...formData, name: e.target.value })
+                }
+                placeholder="AutoCre8"
+              />
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                Tagline
+              </label>
+              <Input
+                value={formData.tagline}
+                onChange={(e) =>
+                  setFormData({ ...formData, tagline: e.target.value })
+                }
+                placeholder="Design for everyone"
+              />
+            </div>
           </div>
 
-          {/* Logo URL */}
           <div>
-            <label className="block text-sm font-semibold text-gray-900 mb-2">
-              Logo URL *
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              What does the brand do? (About)
             </label>
-            <input
-              type="url"
-              required
-              value={formData.logoUrl}
-              onChange={(e) =>
-                setFormData({ ...formData, logoUrl: e.target.value })
-              }
-              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
-              placeholder="https://example.com/logo.png"
-            />
-          </div>
-
-          {/* Tagline */}
-          <div>
-            <label className="block text-sm font-semibold text-gray-900 mb-2">
-              Tagline
-            </label>
-            <input
-              type="text"
-              value={formData.tagline}
-              onChange={(e) =>
-                setFormData({ ...formData, tagline: e.target.value })
-              }
-              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
-              placeholder="Design with AI"
-            />
-          </div>
-
-          {/* Description */}
-          <div>
-            <label className="block text-sm font-semibold text-gray-900 mb-2">
-              Description
-            </label>
-            <textarea
+            <Textarea
               value={formData.description}
               onChange={(e) =>
                 setFormData({ ...formData, description: e.target.value })
               }
-              rows={3}
-              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
-              placeholder="Tell us about your brand..."
+              placeholder="We are a tech company specializing in AI..."
+              rows={2}
             />
           </div>
 
-          {/* Industry */}
-          <div>
-            <label className="block text-sm font-semibold text-gray-900 mb-2">
-              Industry
-            </label>
-            <select
-              value={formData.industry}
-              onChange={(e) =>
-                setFormData({ ...formData, industry: e.target.value })
-              }
-              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
-            >
-              <option value="">Select industry</option>
-              <option value="Technology">Technology</option>
-              <option value="Fashion">Fashion</option>
-              <option value="Food & Beverage">Food & Beverage</option>
-              <option value="Healthcare">Healthcare</option>
-              <option value="Finance">Finance</option>
-              <option value="Education">Education</option>
-              <option value="Entertainment">Entertainment</option>
-              <option value="Other">Other</option>
-            </select>
+          <div className="grid grid-cols-2 gap-4">
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                Brand Identity
+              </label>
+              <Textarea
+                value={formData.brandIdentity}
+                onChange={(e) =>
+                  setFormData({ ...formData, brandIdentity: e.target.value })
+                }
+                placeholder="e.g. Modern, Minimalist, Professional..."
+                rows={3}
+              />
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                Font Preferences
+              </label>
+              <Textarea
+                value={formData.fontType}
+                onChange={(e) =>
+                  setFormData({ ...formData, fontType: e.target.value })
+                }
+                placeholder="e.g. Sans-Serif fonts like Inter, Bold headings..."
+                rows={3}
+              />
+            </div>
           </div>
 
-          {/* Actions */}
-          <div className="flex gap-3 pt-4">
+          <div className="grid grid-cols-2 gap-4">
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                Color Theme
+              </label>
+              <Textarea
+                value={formData.colorTheme}
+                onChange={(e) =>
+                  setFormData({ ...formData, colorTheme: e.target.value })
+                }
+                placeholder="e.g. Dark mode primarily, using Neon Blue for accents..."
+                rows={3}
+              />
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                Fixed Background URL
+              </label>
+              <Input
+                value={formData.backgroundImageUrl}
+                onChange={(e) =>
+                  setFormData({
+                    ...formData,
+                    backgroundImageUrl: e.target.value,
+                  })
+                }
+                placeholder="https://..."
+              />
+              <p className="text-xs text-gray-500 mt-1">
+                Optional fixed background image
+              </p>
+            </div>
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              Logo URL
+            </label>
+            <Input
+              value={formData.logoUrl}
+              onChange={(e) =>
+                setFormData({ ...formData, logoUrl: e.target.value })
+              }
+              placeholder="https://example.com/logo.png"
+            />
+          </div>
+
+          <div className="flex gap-3 pt-4 border-t border-gray-100">
             <Button
               type="button"
               onClick={onClose}
-              className="flex-1 bg-gray-100 text-gray-700 hover:bg-gray-200"
-              disabled={loading}
+              variant="outline"
+              className="flex-1"
             >
               Cancel
             </Button>
             <Button
               type="submit"
-              className="flex-1 bg-indigo-600 text-white hover:bg-indigo-700"
+              className="flex-1 bg-indigo-600 hover:bg-indigo-700"
               disabled={loading}
             >
               {loading ? "Creating..." : "Create Brand"}

@@ -169,7 +169,7 @@ const ElementsPanel = () => {
   return (
     <div className="space-y-4">
       <div>
-        <h4 className="text-xs font-semibold text-gray-500 uppercase mb-3">
+        <h4 className="text-sm font-semibold text-gray-500 uppercase mb-3">
           Shapes & Elements
         </h4>
         <div className="grid grid-cols-2 gap-2">
@@ -179,7 +179,7 @@ const ElementsPanel = () => {
               <Button
                 key={idx}
                 variant="outline"
-                className="h-20 flex flex-col items-center justify-center gap-2 hover:bg-blue-50 hover:border-blue-300 transition-colors"
+                className="h-20 flex flex-col items-center justify-center gap-2 hover:bg-blue-50 hover:border-blue-300 transition-colors cursor-pointer"
                 onClick={() => handleAddShape(shape.config)}
               >
                 <Icon className="w-6 h-6 text-gray-700" />
@@ -189,7 +189,7 @@ const ElementsPanel = () => {
           })}
           <Button
             variant="outline"
-            className="h-20 flex flex-col items-center justify-center gap-2 hover:bg-blue-50 hover:border-blue-300 transition-colors"
+            className="h-20 flex flex-col items-center justify-center gap-2 hover:bg-blue-50 hover:border-blue-300 transition-colors cursor-pointer"
             onClick={handleAddText}
           >
             <Type className="w-6 h-6 text-gray-700" />

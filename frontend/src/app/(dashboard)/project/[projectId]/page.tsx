@@ -86,6 +86,7 @@ const ProjectDetailPage = () => {
   const [brandMembers, setBrandMembers] = useState<BrandMember[]>([]);
   const [loadingMembers, setLoadingMembers] = useState(false);
   const [canvases, setCanvases] = useState<Canvas[]>([]);
+  const [canvasesLoading, setCanvasesLoading] = useState(false);
   const [showCanvasModal, setShowCanvasModal] = useState(false);
   const [canvasName, setCanvasName] = useState("");
   const [canvasTemplate, setCanvasTemplate] = useState("instagram-post");
@@ -93,9 +94,6 @@ const ProjectDetailPage = () => {
   const [customHeight, setCustomHeight] = useState("");
   const [creatingCanvas, setCreatingCanvas] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
-  const [activeTab, setActiveTab] = useState<
-    "designs" | "guidelines" | "assets"
-  >("designs");
 
   useEffect(() => {
     fetchProject();
@@ -145,6 +143,7 @@ const ProjectDetailPage = () => {
 
   const fetchCanvases = async () => {
     try {
+      setCanvasesLoading(true);
       const res = await fetch(`/api/project/${projectId}/canvas`);
       const data = await res.json();
 
@@ -153,6 +152,8 @@ const ProjectDetailPage = () => {
       }
     } catch (e) {
       console.error("Failed to load canvases");
+    } finally {
+      setCanvasesLoading(false);
     }
   };
 
@@ -257,7 +258,6 @@ const ProjectDetailPage = () => {
   const createCanvas = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    // Validate custom dimensions
     if (canvasTemplate === "custom") {
       if (!customWidth || !customHeight) {
         alert("Please enter both width and height for custom canvas");
@@ -280,7 +280,6 @@ const ProjectDetailPage = () => {
         template: canvasTemplate,
       };
 
-      // Add custom dimensions if template is custom
       if (canvasTemplate === "custom") {
         payload.customWidth = parseInt(customWidth);
         payload.customHeight = parseInt(customHeight);
@@ -348,7 +347,7 @@ const ProjectDetailPage = () => {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      {/* Header - matching projects page style */}
+      {/* Header */}
       <div className="bg-white border-b border-gray-200">
         <div className="max-w-7xl mx-auto px-6 py-6">
           <div className="flex items-center gap-4 mb-6">
@@ -356,7 +355,7 @@ const ProjectDetailPage = () => {
               variant="ghost"
               size="sm"
               onClick={() => router.push("/project")}
-              className="hover:bg-gray-100"
+              className="hover:bg-gray-100 cursor-pointer"
             >
               <ArrowLeft className="w-4 h-4 mr-2" />
               Back
@@ -380,10 +379,10 @@ const ProjectDetailPage = () => {
             )}
           </div>
 
-          <div className="flex items-start justify-between mb-6">
+          <div className="flex items-start justify-between">
             <div className="flex-1">
               <h1 className="text-3xl font-bold text-gray-900 mb-2">
-                {project.name}
+                {project.name} {`(${canvases.length})`}
               </h1>
               {project.description && (
                 <p className="text-gray-600 max-w-2xl">{project.description}</p>
@@ -392,7 +391,7 @@ const ProjectDetailPage = () => {
             <div className="flex items-center gap-2">
               <Button
                 onClick={() => setShowCanvasModal(true)}
-                className="bg-blue-600 hover:bg-blue-700"
+                className="bg-blue-600 hover:bg-blue-700 cursor-pointer"
               >
                 <Plus className="w-4 h-4 mr-2" />
                 New Design
@@ -401,49 +400,12 @@ const ProjectDetailPage = () => {
                 <Button
                   variant="outline"
                   onClick={handleDelete}
-                  className="hover:bg-red-50 hover:text-red-600 hover:border-red-200"
+                  className="hover:bg-red-50 hover:text-red-600 hover:border-red-200 cursor-pointer"
                 >
                   <Trash2 className="w-4 h-4" />
                 </Button>
               )}
             </div>
-          </div>
-
-          {/* Tabs */}
-          <div className="flex gap-1 -mb-[1px]">
-            {[
-              { key: "designs", label: "Designs", count: canvases.length },
-              {
-                key: "guidelines",
-                label: "Guidelines",
-                show: !!project.guidelines,
-              },
-              {
-                key: "assets",
-                label: "Assets",
-                count: project.sharedAssets?.length || 0,
-                show: (project.sharedAssets?.length || 0) > 0,
-              },
-            ]
-              .filter((tab) => tab.show !== false)
-              .map((tab) => (
-                <button
-                  key={tab.key}
-                  onClick={() => setActiveTab(tab.key as any)}
-                  className={`px-4 py-2 text-sm font-medium transition-all border-b-2 ${
-                    activeTab === tab.key
-                      ? "border-blue-600 text-blue-600"
-                      : "border-transparent text-gray-600 hover:text-gray-900"
-                  }`}
-                >
-                  {tab.label}
-                  {tab.count !== undefined && tab.count > 0 && (
-                    <span className="ml-2 px-2 py-0.5 text-xs rounded-full bg-gray-100 text-gray-600">
-                      {tab.count}
-                    </span>
-                  )}
-                </button>
-              ))}
           </div>
         </div>
       </div>
@@ -451,230 +413,126 @@ const ProjectDetailPage = () => {
       {/* Content */}
       <div className="max-w-7xl mx-auto px-6 py-8">
         <div className="grid lg:grid-cols-4 gap-6">
-          {/* Main Content */}
+          {/* Main Content - Designs */}
           <div className="lg:col-span-3">
-            {/* Designs Tab */}
-            {activeTab === "designs" && (
-              <div>
-                {/* Search Bar */}
-                <div className="mb-6">
-                  <div className="relative max-w-md">
-                    <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
-                    <Input
-                      placeholder="Search designs..."
-                      value={searchQuery}
-                      onChange={(e) => setSearchQuery(e.target.value)}
-                      className="pl-10 border-gray-300 focus:border-blue-500 focus:ring-blue-500"
-                    />
-                  </div>
-                </div>
+            {/* Search Bar */}
+            <div className="mb-6">
+              <div className="relative max-w-md">
+                <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+                <Input
+                  placeholder="Search designs..."
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  className="pl-10 border-gray-300 focus:border-blue-500 focus:ring-blue-500"
+                  disabled={canvasesLoading}
+                />
+              </div>
+            </div>
 
-                {filteredCanvases.length === 0 ? (
-                  <div className="text-center py-20 bg-white rounded-lg border border-gray-200">
-                    <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-blue-50 mb-4">
-                      <FileText className="w-8 h-8 text-blue-600" />
+            {canvasesLoading ? (
+              // Loading skeleton
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                {[1, 2, 3, 4, 5, 6].map((i) => (
+                  <div
+                    key={i}
+                    className="bg-white rounded-lg border border-gray-200 overflow-hidden animate-pulse"
+                  >
+                    <div className="aspect-video bg-gray-200" />
+                    <div className="p-4 space-y-3">
+                      <div className="h-4 bg-gray-200 rounded w-3/4" />
+                      <div className="flex justify-between">
+                        <div className="h-3 bg-gray-200 rounded w-1/4" />
+                        <div className="h-3 bg-gray-200 rounded w-1/4" />
+                      </div>
                     </div>
-                    <h3 className="text-lg font-semibold text-gray-900 mb-2">
-                      {searchQuery ? "No designs found" : "No designs yet"}
-                    </h3>
-                    <p className="text-gray-500 mb-6 max-w-sm mx-auto">
-                      {searchQuery
-                        ? "Try different keywords or create a new design"
-                        : "Create your first canvas to start designing"}
-                    </p>
-                    {!searchQuery && (
-                      <Button
-                        onClick={() => setShowCanvasModal(true)}
-                        className="bg-blue-600 hover:bg-blue-700"
-                      >
-                        <Plus className="w-4 h-4 mr-2" />
-                        Create Canvas
-                      </Button>
-                    )}
                   </div>
-                ) : (
-                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-                    {filteredCanvases.map((canvas) => {
-                      const hasThumbnail =
-                        canvas.thumbnail && canvas.thumbnail.trim().length > 0;
-
-                      return (
-                        <div
-                          key={canvas._id}
-                          className="group bg-white rounded-lg border border-gray-200 overflow-hidden hover:shadow-lg hover:border-blue-300 transition-all duration-200 cursor-pointer"
-                          onClick={() => router.push(`/canvas/${canvas._id}`)}
-                        >
-                          {/* Thumbnail */}
-                          <div className="relative aspect-video bg-gradient-to-br from-blue-50 to-blue-100 flex items-center justify-center">
-                            {hasThumbnail ? (
-                              <Image
-                                src={canvas.thumbnail!}
-                                alt={canvas.name}
-                                width={100}
-                                height={100}
-                                onError={(e) => {
-                                  e.currentTarget.style.display = "none";
-                                }}
-                              />
-                            ) : (
-                              <FileText className="w-12 h-12 text-blue-400" />
-                            )}
-
-                            {/* Delete Button */}
-                            {isOwner && (
-                              <button
-                                onClick={(e) => {
-                                  e.stopPropagation();
-                                  handleDeleteCanvas(canvas._id);
-                                }}
-                                className="absolute top-2 right-2 p-1.5 bg-white rounded-md shadow-sm opacity-0 group-hover:opacity-100 hover:bg-red-50 transition-all"
-                              >
-                                <Trash2 className="w-4 h-4 text-red-600" />
-                              </button>
-                            )}
-                          </div>
-
-                          {/* Content */}
-                          <div className="p-4">
-                            <h3 className="font-semibold text-gray-900 mb-1 line-clamp-1">
-                              {canvas.name}
-                            </h3>
-                            <div className="flex items-center justify-between">
-                              <p className="text-xs text-gray-500 capitalize">
-                                {canvas.template.replace("-", " ")}
-                              </p>
-                              <div className="flex items-center gap-1.5 text-xs text-gray-400">
-                                <Calendar className="w-3.5 h-3.5" />
-                                {formatDate(canvas.updatedAt)}
-                              </div>
-                            </div>
-                          </div>
-                        </div>
-                      );
-                    })}
-                  </div>
+                ))}
+              </div>
+            ) : filteredCanvases.length === 0 ? (
+              <div className="text-center py-20 bg-white rounded-lg border border-gray-200">
+                <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-blue-50 mb-4">
+                  <FileText className="w-8 h-8 text-blue-600" />
+                </div>
+                <h3 className="text-lg font-semibold text-gray-900 mb-2">
+                  {searchQuery ? "No designs found" : "No designs yet"}
+                </h3>
+                <p className="text-gray-500 mb-6 max-w-sm mx-auto">
+                  {searchQuery
+                    ? "Try different keywords or create a new design"
+                    : "Create your first canvas to start designing"}
+                </p>
+                {!searchQuery && (
+                  <Button
+                    onClick={() => setShowCanvasModal(true)}
+                    className="bg-blue-600 hover:bg-blue-700 cursor-pointer"
+                  >
+                    <Plus className="w-4 h-4 mr-2" />
+                    Create Canvas
+                  </Button>
                 )}
               </div>
-            )}
+            ) : (
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                {filteredCanvases.map((canvas) => {
+                  const hasThumbnail =
+                    canvas.thumbnail && canvas.thumbnail.trim().length > 0;
 
-            {/* Guidelines Tab */}
-            {activeTab === "guidelines" && project.guidelines && (
-              <div className="bg-white rounded-lg border border-gray-200">
-                <table className="w-full">
-                  <thead className="bg-gray-50 border-b border-gray-200">
-                    <tr>
-                      <th className="px-6 py-3 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider w-1/4">
-                        Category
-                      </th>
-                      <th className="px-6 py-3 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">
-                        Details
-                      </th>
-                    </tr>
-                  </thead>
-                  <tbody className="divide-y divide-gray-200">
-                    {project.guidelines.objective && (
-                      <tr className="hover:bg-gray-50 transition-colors">
-                        <td className="px-6 py-4 text-sm font-medium text-gray-900 align-top">
-                          Objective
-                        </td>
-                        <td className="px-6 py-4 text-sm text-gray-800">
-                          {project.guidelines.objective}
-                        </td>
-                      </tr>
-                    )}
-
-                    {project.guidelines.deliverables &&
-                      project.guidelines.deliverables.length > 0 && (
-                        <tr className="hover:bg-gray-50 transition-colors">
-                          <td className="px-6 py-4 text-sm font-medium text-gray-900 align-top">
-                            Deliverables
-                          </td>
-                          <td className="px-6 py-4 text-sm text-gray-800">
-                            <ul className="space-y-2">
-                              {project.guidelines.deliverables.map((d, i) => (
-                                <li key={i} className="flex items-start gap-2">
-                                  <span className="w-1.5 h-1.5 rounded-full bg-blue-600 mt-2 flex-shrink-0" />
-                                  <span>{d}</span>
-                                </li>
-                              ))}
-                            </ul>
-                          </td>
-                        </tr>
-                      )}
-
-                    {project.guidelines.preferredColors &&
-                      project.guidelines.preferredColors.length > 0 && (
-                        <tr className="hover:bg-gray-50 transition-colors">
-                          <td className="px-6 py-4 text-sm font-medium text-gray-900 align-top">
-                            Brand Colors
-                          </td>
-                          <td className="px-6 py-4">
-                            <div className="flex gap-3">
-                              {project.guidelines.preferredColors.map(
-                                (color, i) => (
-                                  <div key={i} className="group relative">
-                                    <div
-                                      className="w-12 h-12 rounded-lg border-2 border-gray-200 shadow-sm group-hover:scale-110 transition-transform cursor-pointer"
-                                      style={{ backgroundColor: color }}
-                                      title={color}
-                                    />
-                                    <span className="absolute -bottom-6 left-1/2 -translate-x-1/2 text-xs text-gray-600 opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap bg-white px-2 py-1 rounded shadow-sm">
-                                      {color}
-                                    </span>
-                                  </div>
-                                )
-                              )}
-                            </div>
-                          </td>
-                        </tr>
-                      )}
-
-                    {project.guidelines.notes && (
-                      <tr className="hover:bg-gray-50 transition-colors">
-                        <td className="px-6 py-4 text-sm font-medium text-gray-900 align-top">
-                          Notes
-                        </td>
-                        <td className="px-6 py-4 text-sm text-gray-800">
-                          {project.guidelines.notes}
-                        </td>
-                      </tr>
-                    )}
-                  </tbody>
-                </table>
-              </div>
-            )}
-
-            {/* Assets Tab */}
-            {activeTab === "assets" &&
-              project.sharedAssets &&
-              project.sharedAssets.length > 0 && (
-                <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
-                  {project.sharedAssets.map((asset, i) => (
+                  return (
                     <div
-                      key={i}
+                      key={canvas._id}
                       className="group bg-white rounded-lg border border-gray-200 overflow-hidden hover:shadow-lg hover:border-blue-300 transition-all duration-200 cursor-pointer"
+                      onClick={() => router.push(`/canvas/${canvas._id}`)}
                     >
-                      <div className="relative aspect-square bg-gradient-to-br from-blue-50 to-blue-100">
-                        <Image
-                          src={asset.url}
-                          alt={asset.name}
-                          fill
-                          className="object-cover"
-                        />
+                      {/* Thumbnail - Fixed aspect ratio */}
+                      <div className="relative aspect-video bg-gradient-to-br from-blue-50 to-blue-100 overflow-hidden">
+                        {hasThumbnail ? (
+                          <img
+                            src={canvas.thumbnail!}
+                            alt={canvas.name}
+                            className="w-full h-full object-contain"
+                            onError={(e) => {
+                              e.currentTarget.style.display = "none";
+                            }}
+                          />
+                        ) : (
+                          <div className="w-full h-full flex items-center justify-center">
+                            <FileText className="w-12 h-12 text-blue-400" />
+                          </div>
+                        )}
+
+                        {/* Delete Button */}
+                        {isOwner && (
+                          <button
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              handleDeleteCanvas(canvas._id);
+                            }}
+                            className="absolute top-2 right-2 p-1.5 bg-white rounded-md shadow-sm opacity-0 group-hover:opacity-100 hover:bg-red-50 transition-all z-10 cursor-pointer"
+                          >
+                            <Trash2 className="w-4 h-4 text-red-600" />
+                          </button>
+                        )}
                       </div>
-                      <div className="p-3">
-                        <p className="text-sm font-semibold text-gray-900 mb-1 line-clamp-1">
-                          {asset.name}
-                        </p>
-                        <div className="flex items-center gap-1.5 text-xs text-gray-400">
-                          <Calendar className="w-3.5 h-3.5" />
-                          {formatDate(asset.addedAt)}
+
+                      <div className="p-4">
+                        <h3 className="font-semibold text-gray-900 mb-1 line-clamp-1">
+                          {canvas.name}
+                        </h3>
+                        <div className="flex items-center justify-between">
+                          <p className="text-xs text-gray-500 capitalize">
+                            {canvas.template.replace("-", " ")}
+                          </p>
+                          <div className="flex items-center gap-1.5 text-xs text-gray-400">
+                            <Calendar className="w-3.5 h-3.5" />
+                            {formatDate(canvas.updatedAt)}
+                          </div>
                         </div>
                       </div>
                     </div>
-                  ))}
-                </div>
-              )}
+                  );
+                })}
+              </div>
+            )}
           </div>
 
           {/* Sidebar - Team Section */}
@@ -688,7 +546,7 @@ const ProjectDetailPage = () => {
                   <Button
                     size="sm"
                     onClick={() => setShowCollabModal(true)}
-                    className="bg-blue-600 hover:bg-blue-700 text-white"
+                    className="bg-blue-600 hover:bg-blue-700 text-white cursor-pointer"
                   >
                     <UserPlus className="w-3.5 h-3.5 mr-1.5" />
                     Invite
@@ -869,14 +727,14 @@ const ProjectDetailPage = () => {
                         setShowCollabModal(false);
                         setCollabEmail("");
                       }}
-                      className="flex-1"
+                      className="flex-1 cursor-pointer"
                     >
                       Cancel
                     </Button>
                     <Button
                       type="submit"
                       disabled={addingCollab}
-                      className="flex-1 bg-blue-600 hover:bg-blue-700"
+                      className="flex-1 bg-blue-600 hover:bg-blue-700 cursor-pointer"
                     >
                       {addingCollab ? "Adding..." : "Send Invite"}
                     </Button>
@@ -923,7 +781,6 @@ const ProjectDetailPage = () => {
                     value={canvasTemplate}
                     onChange={(e) => {
                       setCanvasTemplate(e.target.value);
-                      // Clear custom dimensions when changing away from custom
                       if (e.target.value !== "custom") {
                         setCustomWidth("");
                         setCustomHeight("");
@@ -938,7 +795,6 @@ const ProjectDetailPage = () => {
                   </select>
                 </div>
 
-                {/* Custom Size Inputs - Only show when 'custom' is selected */}
                 {canvasTemplate === "custom" && (
                   <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
                     <div className="flex items-center gap-2 mb-3">
