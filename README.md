@@ -14,12 +14,13 @@ AutoCre8 is a professional canvas-based design platform with AI-powered design a
 
 ### 🎯 Core Features
 
-- **Intelligent Canvas Editor** - Fabric.js-based canvas with zoom, pan, and precision controls
-- **AI Design Assistant** - Get smart layout suggestions and design improvements
-- **Intelligent Resize** - Adapts designs to different canvas sizes
-- **AI Background Removal** - One-click background removal
-- **Project Management** - Organize designs by projects with brand identity
-- **Real-time Collaboration** - Work on designs with your team
+- **AI-Powered Design Assistant** - Create canvas automatically via natural language.
+- **One-Click Intelligent Resize** - Adapts designs to different canvas sizes
+- **Brand-Aware Design** - Respects brand colors, fonts, and guidelines
+- **Image Tranformation** - AI background removal, auto-enhance, Grayscale, blur, sharpen effects
+- **Canvas Editor** - Fabric.js-based canvas with precision controls
+- **Team Collaboration** - Work on designs with your team
+- **Download in PNG/JPEG** - Optimized or original quality
 
 ### 🖼️ Design Tools
 
