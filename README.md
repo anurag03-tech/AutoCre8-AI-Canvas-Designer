@@ -4,17 +4,16 @@ AutoCre8 is a professional canvas-based design platform with AI-powered design a
 
 ## 🚀 Quick Links
 
-| 🔗 **Live Demo** | 🎥 **Video Demo** |
-|:---:|:---:|
+|                    🔗 **Live Demo**                    |                                    🎥 **Video Demo**                                     |
+| :----------------------------------------------------: | :--------------------------------------------------------------------------------------: |
 | [**autocre8.vercel.app**](https://autocre8.vercel.app) | [**Watch Demo**](https://drive.google.com/file/d/1TF4Ux4MLD4rMN88VrpKE7xVGRjODOUSX/view) |
 
-| |  |
-|:---:|:---:|
+|                                          |                                          |
+| :--------------------------------------: | :--------------------------------------: |
 | ![Screenshot 1](./frontend/public/1.png) | ![Screenshot 2](./frontend/public/2.png) |
 | ![Screenshot 3](./frontend/public/3.png) | ![Screenshot 4](./frontend/public/4.png) |
 | ![Screenshot 5](./frontend/public/5.png) | ![Screenshot 6](./frontend/public/6.png) |
 | ![Screenshot 7](./frontend/public/7.png) | ![Screenshot 8](./frontend/public/8.png) |
-
 
 ## ✨ Features
 
@@ -95,7 +94,6 @@ AutoCre8 is a professional canvas-based design platform with AI-powered design a
 ├── NextAuth.js (Authentication)
 ```
 
-
 ## 🚀 Getting Started
 
 ### Prerequisites
@@ -110,8 +108,8 @@ AutoCre8 is a professional canvas-based design platform with AI-powered design a
 #### 1. Clone Repository
 
 ```bash
-git clone https://github.com/yourusername/autocre8.git
-cd autocre8
+git clone https://github.com/anurag03-tech/AutoCre8-AI-Canvas-Designer
+cd AutoCre8-AI-Canvas-Designer
 ```
 
 #### 2. Setup Frontend
@@ -159,7 +157,9 @@ source venv/bin/activate  # On Windows: venv\Scripts\activate
 pip install -r requirements.txt
 
 ```
+
 **AI Service Environment Variables:**
+
 ```env
 
 # Create .env
@@ -180,7 +180,7 @@ ANTHROPIC_API_KEY=sk-ant-...
 # OpenRouter (Optional - Claude fallback)
 OPENROUTER_API_KEY=sk-or-...
 
-# Pixabay 
+# Pixabay
 PIXABAY_API_KEY=53976040-1c3373e201e4d5f9d23322cce
 
 # ImageKit

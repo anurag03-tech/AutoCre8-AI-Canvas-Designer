@@ -1,4 +1,3 @@
-// components/canvas/CanvasHeader.tsx
 "use client";
 
 import React, { useState } from "react";
@@ -195,7 +194,36 @@ const CanvasHeader = ({
     handleResizeCanvas("custom", { width, height });
   };
 
-  // ✅ NEW: Download functions
+  // ✅ Helper: normalize content (prevents extra white space)
+  const normalizeCanvasContent = (fabricCanvas: any) => {
+    const objects = fabricCanvas
+      .getObjects()
+      .filter((o: any) => o !== fabricCanvas.backgroundImage);
+
+    if (!objects.length) return;
+
+    let minY = Infinity;
+    let maxY = -Infinity;
+
+    objects.forEach((obj: any) => {
+      const rect = obj.getBoundingRect(true);
+      minY = Math.min(minY, rect.top);
+      maxY = Math.max(maxY, rect.top + rect.height);
+    });
+
+    const contentHeight = maxY - minY;
+
+    if (contentHeight < fabricCanvas.height) {
+      const offsetY = (fabricCanvas.height - contentHeight) / 2 - minY;
+
+      objects.forEach((obj: any) => {
+        obj.top += offsetY;
+        obj.setCoords();
+      });
+    }
+  };
+
+  // ✅ FIXED: Complete download logic with proper PNG + JPEG support
   const downloadCanvas = (
     format: "png" | "jpeg",
     quality: "optimized" | "original"
@@ -208,88 +236,140 @@ const CanvasHeader = ({
 
     setIsDownloading(true);
 
-    try {
-      // Reset zoom to 1:1 for export
-      const currentZoom = fabricCanvas.getZoom();
-      const currentVpTransform = fabricCanvas.viewportTransform
-        ? [...fabricCanvas.viewportTransform]
-        : null;
+    // 🔒 Save original canvas state
+    const originalZoom = fabricCanvas.getZoom();
+    const originalVp = fabricCanvas.viewportTransform
+      ? [...fabricCanvas.viewportTransform]
+      : null;
 
+    const originalObjects = fabricCanvas.getObjects().map((o: any) => ({
+      obj: o,
+      top: o.top,
+    }));
+
+    try {
+      // ✅ Normalize canvas for export
       fabricCanvas.setZoom(1);
       fabricCanvas.setViewportTransform([1, 0, 0, 1, 0, 0]);
+      normalizeCanvasContent(fabricCanvas);
+      fabricCanvas.renderAll();
 
-      let dataURL: string;
-      let fileName: string;
+      let dataURL = "";
+      let finalFormat = format;
 
-      if (quality === "optimized") {
-        // Optimized version - compress to < 500KB
-        let qualityValue = format === "jpeg" ? 0.8 : 1.0;
-        let multiplier = 1.0;
+      /* ================= PNG OPTIMIZED (Convert to JPEG) ================= */
+      if (format === "png" && quality === "optimized") {
+        // PNG can't be truly compressed client-side, so convert to JPEG for optimization
+        const qualitySteps = [0.85, 0.75, 0.65, 0.55, 0.45];
 
-        // Try different quality settings to get under 500KB
-        for (let q = qualityValue; q >= 0.3; q -= 0.1) {
-          dataURL = fabricCanvas.toDataURL({
-            format: format,
+        for (const q of qualitySteps) {
+          const testURL = fabricCanvas.toDataURL({
+            format: "jpeg",
             quality: q,
-            multiplier: multiplier,
+            multiplier: 1,
           });
 
-          // Estimate file size (base64 length * 0.75 / 1024)
-          const estimatedSize = (dataURL.length * 0.75) / 1024;
-
-          if (estimatedSize < 500) {
+          const sizeKB = (testURL.length * 0.75) / 1024;
+          if (sizeKB <= 500) {
+            dataURL = testURL;
+            finalFormat = "jpeg";
             console.log(
-              `✅ Optimized ${format.toUpperCase()} size: ~${Math.round(
-                estimatedSize
-              )}KB`
+              `✅ PNG optimized as JPEG to ~${Math.round(
+                sizeKB
+              )}KB at quality ${q}`
             );
             break;
           }
+        }
 
-          // If still too large, reduce multiplier
-          if (q <= 0.3 && multiplier > 0.5) {
-            multiplier -= 0.1;
-            q = qualityValue; // Reset quality and try with lower resolution
+        // fallback
+        if (!dataURL) {
+          dataURL = fabricCanvas.toDataURL({
+            format: "jpeg",
+            quality: 0.4,
+            multiplier: 1,
+          });
+          finalFormat = "jpeg";
+          const sizeKB = (dataURL.length * 0.75) / 1024;
+          console.log(
+            `⚠️ PNG optimized as JPEG using fallback quality 0.4 (~${Math.round(
+              sizeKB
+            )}KB)`
+          );
+        }
+      } else if (format === "jpeg" && quality === "optimized") {
+        /* ================= JPEG OPTIMIZED ================= */
+        const qualitySteps = [0.85, 0.75, 0.65, 0.55, 0.45];
+
+        for (const q of qualitySteps) {
+          const testURL = fabricCanvas.toDataURL({
+            format: "jpeg",
+            quality: q,
+            multiplier: 1,
+          });
+
+          const sizeKB = (testURL.length * 0.75) / 1024;
+          if (sizeKB <= 500) {
+            dataURL = testURL;
+            console.log(
+              `✅ JPEG optimized to ~${Math.round(sizeKB)}KB at quality ${q}`
+            );
+            break;
           }
         }
 
-        fileName = `${canvas.name}_optimized.${format}`;
+        // fallback
+        if (!dataURL) {
+          dataURL = fabricCanvas.toDataURL({
+            format: "jpeg",
+            quality: 0.4,
+            multiplier: 1,
+          });
+          const sizeKB = (dataURL.length * 0.75) / 1024;
+          console.log(
+            `⚠️ JPEG using fallback quality 0.4 (~${Math.round(sizeKB)}KB)`
+          );
+        }
       } else {
-        // Original high quality version
+        /* ================= ORIGINAL ================= */
         dataURL = fabricCanvas.toDataURL({
-          format: format,
-          quality: 1.0,
-          multiplier: 1.0,
+          format,
+          quality: 1,
+          multiplier: 1,
         });
-
-        const estimatedSize = (dataURL!.length * 0.75) / 1024;
+        const sizeKB = (dataURL.length * 0.75) / 1024;
         console.log(
-          `📦 Original ${format.toUpperCase()} size: ~${Math.round(
-            estimatedSize
-          )}KB`
+          `✅ ${format.toUpperCase()} original quality ~${Math.round(sizeKB)}KB`
         );
-
-        fileName = `${canvas.name}_original.${format}`;
       }
 
-      // Restore original zoom and viewport
-      fabricCanvas.setZoom(currentZoom);
-      if (currentVpTransform) {
-        fabricCanvas.setViewportTransform(currentVpTransform);
+      if (!dataURL) {
+        throw new Error("Failed to generate image");
       }
+
+      // ⬇️ Download
+      const link = document.createElement("a");
+      link.href = dataURL;
+      link.download = `${canvas.name}_${quality}.${finalFormat}`;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+
+      console.log(`✅ Downloaded: ${canvas.name}_${quality}.${finalFormat}`);
+    } catch (err) {
+      console.error("Download failed:", err);
+      alert("Download failed");
+    } finally {
+      // 🔁 Restore canvas state
+      originalObjects.forEach(({ obj, top }) => {
+        obj.top = top;
+        obj.setCoords();
+      });
+
+      fabricCanvas.setZoom(originalZoom);
+      if (originalVp) fabricCanvas.setViewportTransform(originalVp);
       fabricCanvas.renderAll();
 
-      // Download the image
-      const link = document.createElement("a");
-      link.download = fileName;
-      link.href = dataURL!;
-      link.click();
-
-      console.log(`✅ Downloaded: ${fileName}`);
-    } catch (error) {
-      console.error("Download error:", error);
-      alert("Failed to download canvas");
-    } finally {
       setIsDownloading(false);
     }
   };
@@ -411,26 +491,6 @@ const CanvasHeader = ({
             )}
           </div>
 
-          {/* Center - Undo/Redo */}
-          <div className="flex items-center gap-1">
-            <Button
-              variant="ghost"
-              size="sm"
-              className="w-9 h-9 p-0 rounded-lg"
-              disabled
-            >
-              <Undo className="w-4 h-4" />
-            </Button>
-            <Button
-              variant="ghost"
-              size="sm"
-              className="w-9 h-9 p-0 rounded-lg"
-              disabled
-            >
-              <Redo className="w-4 h-4" />
-            </Button>
-          </div>
-
           {/* Right section */}
           <div className="flex items-center gap-2">
             <Button variant="outline" size="sm" onClick={handleSave}>
@@ -447,23 +507,28 @@ const CanvasHeader = ({
               </Button>
             )}
 
-            {/* ✅ Download dropdown */}
+            {/* ✅ Fixed Download dropdown */}
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <Button variant="outline" size="sm" disabled={isDownloading}>
                   <Download className="w-4 h-4 mr-1" />
-                  Download
+                  {isDownloading ? "Downloading..." : "Download"}
                   <ChevronDown className="w-3 h-3 ml-1" />
                 </Button>
               </DropdownMenuTrigger>
-              <DropdownMenuContent align="end" className="w-56">
+              <DropdownMenuContent align="end" className="w-64">
                 <div className="px-2 py-1.5 text-xs font-semibold text-gray-500">
                   Optimized (&lt;500KB)
                 </div>
                 <DropdownMenuItem
                   onClick={() => downloadCanvas("png", "optimized")}
                 >
-                  PNG - Optimized
+                  <div className="flex flex-col">
+                    <span>PNG - Optimized</span>
+                    <span className="text-xs text-gray-500">
+                      Converts to JPEG for smaller size
+                    </span>
+                  </div>
                 </DropdownMenuItem>
                 <DropdownMenuItem
                   onClick={() => downloadCanvas("jpeg", "optimized")}

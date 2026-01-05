@@ -47,20 +47,26 @@ const Home = () => {
             <Link href="/home">
               <Button
                 size="lg"
-                className="group bg-gradient-to-r from-indigo-500 to-purple-600 hover:from-indigo-600 hover:to-purple-700 shadow-2xl shadow-indigo-500/25 h-14 px-8 text-lg font-semibold text-white rounded-2xl transition-all duration-300 hover:scale-105 hover:shadow-indigo-500/50"
+                className="group bg-gradient-to-r from-indigo-500 to-purple-600 hover:from-indigo-600 hover:to-purple-700 shadow-2xl shadow-indigo-500/25 h-14 px-8 text-lg font-semibold text-white rounded-2xl transition-all duration-300 hover:scale-105 hover:shadow-indigo-500/50 cursor-pointer"
               >
                 <Sparkles className="w-5 h-5 mr-2 group-hover:rotate-12 transition-transform" />
                 Start Creating Free
                 <ArrowRight className="w-5 h-5 ml-2 group-hover:translate-x-1 transition-transform" />
               </Button>
             </Link>
-            <Button
-              variant="outline"
-              size="lg"
-              className="h-14 px-8 text-lg border-2 border-zinc-200 dark:border-zinc-700 hover:bg-zinc-50 dark:hover:bg-zinc-800 rounded-2xl font-semibold"
+            <Link
+              href="https://github.com/anurag03-tech/AutoCre8-AI-Canvas-Designer"
+              target="_blank"
+              rel="noopener noreferrer"
             >
-              GitHub
-            </Button>
+              <Button
+                variant="outline"
+                size="lg"
+                className="h-14 px-8 text-lg border-2 border-zinc-200 dark:border-zinc-700 hover:bg-zinc-50 dark:hover:bg-zinc-800 rounded-2xl font-semibold cursor-pointer transition-all duration-300 hover:scale-105"
+              >
+                GitHub
+              </Button>
+            </Link>
           </div>
         </div>
 

@@ -15,6 +15,7 @@ import PropertiesPanel from "./toolbar/PropertiesPanel";
 import ProjectGalleryPanel from "./toolbar/ProjectGalleryPanel";
 import AIAssistantPanel from "./toolbar/AIAssistantPanel";
 import LayersPanel from "./toolbar/LayersPanel";
+import CompliancePanel from "./toolbar/CompliancePanel"; // ✅ NEW
 
 export type ToolType =
   | "elements"
@@ -23,8 +24,8 @@ export type ToolType =
   | "background"
   | "layers"
   | "ai"
-  | "brand"
   | "collaborates"
+  | "compliance" // ✅ NEW
   | null;
 
 const CanvasToolbox = () => {
@@ -121,6 +122,9 @@ const CanvasToolbox = () => {
                 {activePanel === "ai" && <AIAssistantPanel />}
 
                 {activePanel === "layers" && <LayersPanel />}
+
+                {/* ✅ NEW: Compliance Panel */}
+                {activePanel === "compliance" && <CompliancePanel />}
               </>
             )}
           </div>

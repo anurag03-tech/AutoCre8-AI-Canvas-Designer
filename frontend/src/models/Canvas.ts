@@ -48,6 +48,21 @@ export interface ICanvas extends Document {
   version: number;
   parentCanvas?: mongoose.Types.ObjectId;
 
+  // ✅ NEW: Compliance Rules (raw text, no formatting)
+  complianceRules?: string;
+
+  // ✅ NEW: Last Validation Results
+  lastValidation?: {
+    timestamp: Date;
+    passed: boolean;
+    issues: Array<{
+      rule: string;
+      status: "pass" | "fail" | "warning";
+      message: string;
+      suggestion?: string;
+    }>;
+  };
+
   createdAt: Date;
   updatedAt: Date;
   lastEditedAt: Date;
@@ -126,6 +141,29 @@ const CanvasSchema = new Schema<ICanvas>(
     parentCanvas: {
       type: Schema.Types.ObjectId,
       ref: "Canvas",
+    },
+
+    // ✅ NEW: Compliance Rules (stored as raw text)
+    complianceRules: {
+      type: String,
+      default: "",
+    },
+
+    // ✅ NEW: Last Validation Results
+    lastValidation: {
+      timestamp: Date,
+      passed: Boolean,
+      issues: [
+        {
+          rule: String,
+          status: {
+            type: String,
+            enum: ["pass", "fail", "warning"],
+          },
+          message: String,
+          suggestion: String,
+        },
+      ],
     },
 
     lastEditedAt: {

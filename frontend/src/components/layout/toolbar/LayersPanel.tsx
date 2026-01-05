@@ -41,37 +41,6 @@ const LayersPanel: React.FC = () => {
     setLayers(result.slice().reverse());
   };
 
-  const groupSelected = () => {
-    const canvas = getFabricCanvas();
-    if (!canvas) return;
-    const active = canvas.getActiveObjects();
-    if (active.length <= 1) return;
-
-    const fabricNS = (window as any).fabric;
-    if (!fabricNS || !fabricNS.Group) return;
-
-    const group = new fabricNS.Group(active);
-    active.forEach((obj: any) => canvas.remove(obj));
-    canvas.add(group);
-    canvas.setActiveObject(group);
-    canvas.renderAll();
-    refreshLayers();
-  };
-
-  const ungroupSelected = () => {
-    const canvas = getFabricCanvas();
-    if (!canvas) return;
-    const active: any = canvas.getActiveObject();
-    if (!active || active.type !== "group") return;
-
-    const items = active._objects || [];
-    active._restoreObjectsState && active._restoreObjectsState();
-    canvas.remove(active);
-    items.forEach((obj: any) => canvas.add(obj));
-    canvas.renderAll();
-    refreshLayers();
-  };
-
   useEffect(() => {
     refreshLayers();
 
@@ -159,71 +128,10 @@ const LayersPanel: React.FC = () => {
     refreshLayers();
   };
 
-  const selectAllByType = (type: "text" | "image") => {
-    const canvas = getFabricCanvas();
-    if (!canvas) return;
-
-    const objects = canvas.getObjects();
-    const filtered = objects.filter((obj: any) => {
-      if (type === "text") {
-        return (
-          obj.type === "i-text" || obj.type === "textbox" || obj.type === "text"
-        );
-      }
-      if (type === "image") {
-        return obj.type === "image";
-      }
-      return false;
-    });
-
-    if (filtered.length === 0) return;
-
-    const fabricNS = (window as any).fabric;
-    if (!fabricNS || !fabricNS.ActiveSelection) return;
-
-    const activeSelection = new fabricNS.ActiveSelection(filtered, { canvas });
-    canvas.setActiveObject(activeSelection);
-    canvas.renderAll();
-  };
-
   return (
     <div className="flex flex-col h-full gap-3">
-      <div className="flex items-center justify-between text-xs text-gray-600">
+      <div className="flex items-center justify-between text-gray-600">
         <span className="font-medium">Layers</span>
-        <div className="flex gap-1">
-          <Button
-            variant="ghost"
-            size="xs"
-            className="h-6 px-2 text-[11px]"
-            onClick={groupSelected}
-          >
-            Group
-          </Button>
-          <Button
-            variant="ghost"
-            size="xs"
-            className="h-6 px-2 text-[11px]"
-            onClick={ungroupSelected}
-          >
-            Ungroup
-          </Button>
-          <Button
-            variant="ghost"
-            size="xs"
-            className="h-6 px-2 text-[11px]"
-            onClick={() => selectAllByType("text")}
-          >
-            Text
-          </Button>
-          <Button
-            variant="ghost"
-            size="xs"
-            className="h-6 px-2 text-[11px]"
-            onClick={() => selectAllByType("image")}
-          >
-            Images
-          </Button>
-        </div>
       </div>
 
       <div className="flex-1 border rounded-md bg-gray-50 overflow-y-auto">
@@ -237,7 +145,7 @@ const LayersPanel: React.FC = () => {
           <div
             key={layer.id}
             onClick={() => selectLayer(layer)}
-            className={`w-full flex items-center justify-between px-2 py-1 text-xs border-b last:border-b-0 hover:bg-gray-100 cursor-pointer ${
+            className={`w-full flex items-center justify-between px-2 py-1 text-sm border-b last:border-b-0 hover:bg-gray-100 cursor-pointer ${
               selectedIndex === layer.index ? "bg-indigo-50" : ""
             }`}
           >

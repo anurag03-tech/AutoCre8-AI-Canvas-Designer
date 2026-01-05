@@ -12,15 +12,7 @@ const Header = () => {
         <Link href="/" className="text-lg hover:text-blue-600 font-medium">
           Home
         </Link>
-        <Link href="/docs" className="text-lg hover:text-blue-600 font-medium">
-          Docs
-        </Link>
-        <Link
-          href="/contact"
-          className="text-lg hover:text-blue-600 font-medium"
-        >
-          Contact
-        </Link>
+
         <Link href="/auth" className="text-lg hover:text-blue-600 font-medium">
           <Button className="cursor-pointer">Login</Button>
         </Link>

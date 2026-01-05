@@ -28,7 +28,7 @@ const ToolbarIcons: React.FC<Props> = ({ activePanel, onPanelToggle }) => {
     <button
       key={panel}
       onClick={() => onPanelToggle(panel)}
-      className={`flex flex-col items-center gap-1 p-1 py-2 cursor-pointer rounded-lg transition-all duration-200 hover:bg-gray-100 ${
+      className={`flex flex-col items-center gap-1 p-1 py-3 cursor-pointer rounded-lg transition-all duration-200 hover:bg-gray-100 ${
         activePanel === panel ? "bg-indigo-50 text-indigo-600" : "text-gray-600"
       }`}
     >
@@ -42,7 +42,7 @@ const ToolbarIcons: React.FC<Props> = ({ activePanel, onPanelToggle }) => {
         <Icon className="w-5 h-5" />
       </div>
       <span
-        className={`text-[10px] font-medium leading-tight text-center ${
+        className={`text-[12px] font-medium leading-tight text-center ${
           activePanel === panel ? "text-indigo-600" : "text-gray-600"
         }`}
       >
@@ -62,8 +62,7 @@ const ToolbarIcons: React.FC<Props> = ({ activePanel, onPanelToggle }) => {
       <div className="h-px bg-gray-200 my-2 mx-2" />
 
       {iconButton("ai", "AI Assistant", Sparkles)}
-      {iconButton("brand", "Brand", Tag)}
-      {iconButton("collaborates", "Team", Users)}
+      {iconButton("compliance", "Compliance", Tag)}
     </div>
   );
 };
