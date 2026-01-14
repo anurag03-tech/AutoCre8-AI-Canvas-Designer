@@ -156,32 +156,12 @@ pip install -r requirements.txt
 
 # Create .env
 
-# MongoDB
-MONGODB_URI=mongodb+srv://.....
-MONGODB_DB_NAME=database_name
+GOOGLE_API_KEY=........
+GOOGLE_MODEL=gemini-2.5-flash
 
-# Frontend endpoint
-FRONTEND_URL=http://localhost:3000
+OPENAI_API_KEY=sk-proj-....
+OPENAI_MODEL=gpt-4o
 
-# OpenAI
-OPENAI_API_KEY=sk-...
-
-# Anthropic (Optional - for direct Claude access)
-ANTHROPIC_API_KEY=sk-ant-...
-
-# OpenRouter (Optional - Claude fallback)
-OPENROUTER_API_KEY=sk-or-...
-
-# Pixabay
-PIXABAY_API_KEY=53976040-1c3373e201e4d5f9d23322cce
-
-# ImageKit
-IMAGEKIT_PRIVATE_KEY=private_...
-IMAGEKIT_PUBLIC_KEY=public_...
-IMAGEKIT_URL_ENDPOINT=https://ik.imagekit.io/your_id
-
-# Pixabay
-PIXABAY_API_KEY=...
 ```
 
 ### Running the Application
