@@ -122,7 +122,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { requireAuth } from "@/lib/auth";
 import connectDB from "@/lib/connectDB";
-import Canvas from "@/models/Canvas";
 import { Canvas, Project, Brand, User } from "@/models";
 
 // GET - Get canvas
