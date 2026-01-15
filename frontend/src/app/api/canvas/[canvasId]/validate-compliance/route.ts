@@ -2,8 +2,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { requireAuth } from "@/lib/auth";
 import connectDB from "@/lib/connectDB";
-import Canvas from "@/models/Canvas";
-import Project from "@/models/Project";
+import { Canvas, Project, Brand, User } from "@/models";
 import { validateCanvasCompliance } from "@/lib/langchain";
 
 export async function POST(

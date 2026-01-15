@@ -1,7 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { requireAuth } from "@/lib/auth";
-import Brand from "@/models/Brand";
-import User from "@/models/User";
+import { Canvas, Project, Brand, User } from "@/models";
 import connectDB from "@/lib/connectDB";
 
 export async function GET(req: NextRequest) {

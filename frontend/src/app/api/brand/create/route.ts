@@ -1,8 +1,7 @@
 // app/api/brand/create/route.ts
 import { NextRequest, NextResponse } from "next/server";
 import { requireAuth } from "@/lib/auth";
-import Brand from "@/models/Brand";
-import User from "@/models/Brand";
+import { Canvas, Project, Brand, User } from "@/models";
 import connectDB from "@/lib/connectDB";
 
 export async function POST(req: NextRequest) {

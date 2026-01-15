@@ -1,9 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { requireAuth } from "@/lib/auth";
 import connectDB from "@/lib/connectDB";
-import Canvas from "@/models/Canvas";
-import Project from "@/models/Project";
-import Brand from "@/models/Brand";
+import { Canvas, Project, Brand } from "@/models";
 
 export const dynamic = "force-dynamic";
 export const maxDuration = 60;

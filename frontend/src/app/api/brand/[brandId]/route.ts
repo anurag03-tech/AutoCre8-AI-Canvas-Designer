@@ -2,8 +2,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { requireAuth } from "@/lib/auth";
 import connectDB from "@/lib/connectDB";
-import Brand from "@/models/Brand";
-import User from "@/models/User";
+import { Canvas, Project, Brand, User } from "@/models";
 
 // GET - Get brand details
 export async function GET(

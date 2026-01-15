@@ -1,8 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import connectDB from "@/lib/connectDB";
 import { requireAuth } from "@/lib/auth";
-import Canvas from "@/models/Canvas";
-import Project from "@/models/Project";
+import { Canvas, Project, Brand, User } from "@/models";
 
 export async function DELETE(
   req: NextRequest,

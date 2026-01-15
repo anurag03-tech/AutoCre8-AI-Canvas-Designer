@@ -1,8 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { requireAuth } from "@/lib/auth";
 import connectDB from "@/lib/connectDB";
-import Project from "@/models/Project";
-import User from "@/models/User";
+import { Canvas, Project, Brand, User } from "@/models";
 
 export async function POST(
   req: NextRequest,
