@@ -55,9 +55,8 @@ const CanvasPage = () => {
       {/* Main Container: Measures available space */}
       <div
         ref={containerRef}
-        className="flex-1 flex items-center justify-center overflow-hidden p-8"
+        className="flex-1 flex items-center justify-center overflow-hidden relative p-8"
       >
-        {/* ✅ WRAPPER DIV - Apply scale transform here with center origin */}
         <div
           className={`
             bg-white shadow-2xl relative

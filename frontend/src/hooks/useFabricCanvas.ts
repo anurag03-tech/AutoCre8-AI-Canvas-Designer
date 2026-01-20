@@ -5,6 +5,7 @@ import { useEffect, useRef, useCallback, useState } from "react";
 import * as fabric from "fabric";
 import { useCanvas } from "@/contexts/CanvasContext";
 import { imagekitTransformations } from "@/lib/imagekit";
+import { fa } from "zod/v4/locales";
 
 export const useFabricCanvas = ({ canvasId, canvasData }: any) => {
   const { setSelectedObject, setCanvasActions } = useCanvas();
@@ -43,197 +44,6 @@ export const useFabricCanvas = ({ canvasId, canvasData }: any) => {
     };
   }, [calculateScale]);
 
-  // ---------------------------------------------------------
-  // ✅ NEW: SAFE JSON LOADER (Isolates Broken Images)
-  // ---------------------------------------------------------
-  // const loadCanvasJSON = useCallback(
-  //   async (data: any) => {
-  //     if (!fabricCanvasRef.current || !data) return;
-  //     const c = fabricCanvasRef.current;
-
-  //     const jsonToLoad = data.canvasData || data;
-  //     originalCanvasDataRef.current = jsonToLoad;
-
-  //     // 1. Set Dimensions
-  //     const width = jsonToLoad.width || 1280;
-  //     const height = jsonToLoad.height || 720;
-  //     c.setDimensions({ width, height });
-
-  //     // 2. Clear Canvas
-  //     c.clear();
-
-  //     // 3. Set Background manually
-  //     // We do this manually because we aren't using the bulk loadFromJSON anymore
-  //     if (jsonToLoad.background) {
-  //       if (typeof jsonToLoad.background === "string") {
-  //         c.backgroundColor = jsonToLoad.background;
-  //       } else if (
-  //         jsonToLoad.background.type ||
-  //         jsonToLoad.background.colorStops
-  //       ) {
-  //         try {
-  //           const gradient = new fabric.Gradient(jsonToLoad.background);
-  //           c.backgroundColor = gradient;
-  //         } catch (e) {
-  //           console.warn("Background gradient error, defaulting to white", e);
-  //           c.backgroundColor = "#ffffff";
-  //         }
-  //       }
-  //     }
-
-  //     // 4. Safely Load Objects One by One
-  //     const objects = jsonToLoad.objects || [];
-
-  //     // Create an array of promises. If one image fails, we catch it here
-  //     // instead of letting it break the whole Promise.all chain.
-  //     const enlivenPromises = objects.map(async (obj: any) => {
-  //       try {
-  //         // Fix: Ensure images are anonymous to prevent tainting
-  //         if (obj.type === "image") {
-  //           obj.crossOrigin = "anonymous";
-  //         }
-
-  //         // `enlivenObjects` takes an array, even for one object
-  //         const enlivenedResults = await fabric.util.enlivenObjects([obj]);
-  //         return enlivenedResults[0]; // Return the successfully created object
-  //       } catch (error) {
-  //         // 🛑 THIS IS THE FIX:
-  //         // If an image is 404, this block runs.
-  //         // We return null and log it, preventing a full crash.
-  //         console.warn(
-  //           `⚠️ Skipping broken object (likely 404 image): ${obj.type}`
-  //         );
-  //         return null;
-  //       }
-  //     });
-
-  //     // Wait for all attempts to finish (successful or failed)
-  //     const results = await Promise.all(enlivenPromises);
-
-  //     // Add only the valid objects to the canvas
-  //     results.forEach((obj) => {
-  //       if (obj) {
-  //         c.add(obj);
-  //       }
-  //     });
-
-  //     c.requestRenderAll();
-  //     console.log(
-  //       `✅ Canvas loaded: ${c.getObjects().length} valid objects (${
-  //         objects.length - c.getObjects().length
-  //       } skipped)`
-  //     );
-
-  //     // Recalculate scale after loading
-  //     setTimeout(() => calculateScale(), 100);
-  //   },
-  //   [calculateScale]
-  // );
-
-  // const loadCanvasJSON = useCallback(
-  //   async (data: any) => {
-  //     if (!fabricCanvasRef.current || !data) return;
-  //     const c = fabricCanvasRef.current;
-
-  //     const jsonToLoad = data.canvasData || data;
-  //     originalCanvasDataRef.current = jsonToLoad;
-
-  //     // 1. Set Dimensions
-  //     const width = jsonToLoad.width || 1080;
-  //     const height = jsonToLoad.height || 1080;
-  //     c.setDimensions({ width, height });
-
-  //     // 2. Clear Canvas
-  //     c.clear();
-
-  //     // 3. Set Background (with Gradient Support)
-  //     if (jsonToLoad.background) {
-  //       if (typeof jsonToLoad.background === "string") {
-  //         c.backgroundColor = jsonToLoad.background;
-  //       } else if (
-  //         jsonToLoad.background.type ||
-  //         jsonToLoad.background.colorStops
-  //       ) {
-  //         try {
-  //           c.backgroundColor = new fabric.Gradient(jsonToLoad.background);
-  //         } catch (e) {
-  //           console.warn("Background gradient error, defaulting to white", e);
-  //           c.backgroundColor = "#ffffff";
-  //         }
-  //       }
-  //     }
-
-  //     // 4. Safely Load Objects One by One
-  //     const objects = jsonToLoad.objects || [];
-
-  //     const enlivenPromises = objects.map(async (obj: any) => {
-  //       try {
-  //         // IMAGE LOGIC: Manual scale calculation to prevent cropping
-  //         if (obj.type === "image" || obj.type === "FabricImage") {
-  //           return new Promise((resolve) => {
-  //             const imgElement = new Image();
-  //             imgElement.crossOrigin = "anonymous";
-  //             imgElement.src = obj.src;
-
-  //             imgElement.onload = () => {
-  //               const realW = imgElement.naturalWidth;
-  //               const realH = imgElement.naturalHeight;
-  //               const desiredW = obj.width;
-  //               const desiredH = obj.height;
-
-  //               const scaleX = desiredW / realW;
-  //               const scaleY = desiredH / realH;
-
-  //               const fabricImg = new fabric.FabricImage(imgElement, {
-  //                 ...obj,
-  //                 width: realW,
-  //                 height: realH,
-  //                 scaleX: scaleX,
-  //                 scaleY: scaleY,
-  //               });
-  //               resolve(fabricImg);
-  //             };
-
-  //             imgElement.onerror = () => {
-  //               console.warn(`⚠️ Failed to load image: ${obj.src}`);
-  //               resolve(null);
-  //             };
-  //           });
-  //         }
-
-  //         // OTHER OBJECTS: Use standard enliven (Text, Shapes)
-  //         const enlivenedResults = await fabric.util.enlivenObjects([obj]);
-  //         return enlivenedResults[0];
-  //       } catch (error) {
-  //         console.warn(`⚠️ Skipping broken object: ${obj.type}`, error);
-  //         return null;
-  //       }
-  //     });
-
-  //     // Wait for all attempts to finish
-  //     const results = await Promise.all(enlivenPromises);
-
-  //     // Add valid objects to canvas
-  //     results.forEach((obj) => {
-  //       if (obj) {
-  //         c.add(obj);
-  //       }
-  //     });
-
-  //     c.requestRenderAll();
-
-  //     console.log(
-  //       `✅ Canvas loaded: ${c.getObjects().length} valid objects (${
-  //         objects.length - c.getObjects().length
-  //       } skipped)`
-  //     );
-
-  //     // Recalculate container scale after loading
-  //     setTimeout(() => calculateScale(), 100);
-  //   },
-  //   [calculateScale]
-  // );
-
   const loadCanvasJSON = useCallback(
     async (data: any) => {
       if (!fabricCanvasRef.current || !data) return;
@@ -269,75 +79,6 @@ export const useFabricCanvas = ({ canvasId, canvasData }: any) => {
 
       // 4. SAFELY LOAD OBJECTS
       const objects = jsonToLoad.objects || [];
-
-      // const enlivenPromises = objects.map(async (obj: any) => {
-      //   try {
-      //     // --- CASE 1: IMAGES (Manual scaling & sub-property enlivening) ---
-      //     if (obj.type === "image" || obj.type === "FabricImage") {
-      //       return new Promise(async (resolve) => {
-      //         const imgElement = new Image();
-      //         imgElement.crossOrigin = "anonymous";
-      //         imgElement.src = obj.src;
-
-      //         imgElement.onload = async () => {
-      //           // ROOT FIX: Destructure to keep raw JSON objects out of the constructor
-      //           const { clipPath, shadow, type, ...safeProps } = obj;
-
-      //           const realW = imgElement.naturalWidth;
-      //           const realH = imgElement.naturalHeight;
-
-      //           // Calculate correct scale based on source file vs JSON intent
-      //           const scaleX = obj.width / realW;
-      //           const scaleY = obj.height / realH;
-
-      //           const fabricImg = new fabric.FabricImage(imgElement, {
-      //             ...safeProps,
-      //             width: realW,
-      //             height: realH,
-      //             scaleX: scaleX,
-      //             scaleY: scaleY,
-      //           });
-
-      //           // ROOT FIX: Explicitly enliven the ClipPath (Rounded Corners)
-      //           if (clipPath) {
-      //             const enlivenedClip = await fabric.util.enlivenObjects([
-      //               clipPath,
-      //             ]);
-      //             if (enlivenedClip && enlivenedClip[0]) {
-      //               fabricImg.set("clipPath", enlivenedClip[0]);
-      //             }
-      //           }
-
-      //           // ROOT FIX: Explicitly enliven Shadow
-      //           if (shadow) {
-      //             fabricImg.set("shadow", new fabric.Shadow(shadow));
-      //           }
-
-      //           resolve(fabricImg);
-      //         };
-
-      //         imgElement.onerror = () => {
-      //           console.warn(`⚠️ Failed to load image: ${obj.src}`);
-      //           resolve(null);
-      //         };
-      //       });
-      //     }
-
-      //     // --- CASE 2: TEXT & SHAPES (Standard enlivening + gradient fix) ---
-      //     const enlivenedResults = await fabric.util.enlivenObjects([obj]);
-      //     const fabricObj: any = enlivenedResults[0];
-
-      //     if (fabricObj && obj.fill && typeof obj.fill === "object") {
-      //       // ROOT FIX: Convert raw fill JSON into a live Gradient instance
-      //       fabricObj.set("fill", new fabric.Gradient(obj.fill));
-      //     }
-
-      //     return fabricObj;
-      //   } catch (error) {
-      //     console.warn(`⚠️ Skipping broken object: ${obj.type}`, error);
-      //     return null;
-      //   }
-      // });
 
       const enlivenPromises = objects.map(async (obj: any) => {
         try {
@@ -548,21 +289,6 @@ export const useFabricCanvas = ({ canvasId, canvasData }: any) => {
     c.renderAll();
   }, []);
 
-  // const addStyledText = useCallback((config: any) => {
-  //   if (!fabricCanvasRef.current) return;
-  //   const c = fabricCanvasRef.current;
-  //   const { text, shadow, ...props } = config;
-  //   const textObj = new fabric.IText(text || "Text", props);
-
-  //   if (shadow) {
-  //     textObj.shadow = new fabric.Shadow(shadow);
-  //   }
-
-  //   c.add(textObj);
-  //   c.setActiveObject(textObj);
-  //   c.renderAll();
-  // }, []);
-
   const addStyledText = useCallback((config: any) => {
     if (!fabricCanvasRef.current) return;
     const c = fabricCanvasRef.current;
@@ -574,7 +300,7 @@ export const useFabricCanvas = ({ canvasId, canvasData }: any) => {
       top: props.top || 100,
     });
 
-    // ✅ Convert gradient config to Fabric.js Gradient object
+    //  Convert gradient config to Fabric.js Gradient object
     if (gradient) {
       const fabricGradient = new fabric.Gradient({
         type: gradient.type || "linear",
@@ -807,6 +533,7 @@ export const useFabricCanvas = ({ canvasId, canvasData }: any) => {
     const fabricCanvas = new fabric.Canvas(canvasRef.current, {
       backgroundColor: "#ffffff",
       preserveObjectStacking: true,
+      allowTouchScrolling: false,
     });
 
     fabricCanvasRef.current = fabricCanvas;
@@ -839,9 +566,6 @@ export const useFabricCanvas = ({ canvasId, canvasData }: any) => {
     };
   }, [canvasData, loadCanvasJSON, setSelectedObject]);
 
-  // ---------------------------------------------------------
-  // REGISTER ACTIONS
-  // ---------------------------------------------------------
   useEffect(() => {
     setCanvasActions({
       addShape,
