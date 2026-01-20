@@ -122,3 +122,14 @@
     @apply bg-background text-foreground;
   }
 }
+/* Fabric.js v6 scroll fix - targets the hidden textarea directly */
+textarea[autocapitalize="off"][autocorrect="off"] {
+  position: fixed !important;
+  top: 0 !important;
+  left: 0 !important;
+  opacity: 0 !important;
+  width: 1px !important;
+  height: 1px !important;
+  z-index: -999 !important;
+  pointer-events: none !important;
+}

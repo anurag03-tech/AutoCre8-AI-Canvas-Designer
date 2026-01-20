@@ -1,11 +1,10 @@
-// // // // // // // // // // app/src/hooks/useFabricCanvas.ts
+// app/src/hooks/useFabricCanvas.ts
 "use client";
 
 import { useEffect, useRef, useCallback, useState } from "react";
 import * as fabric from "fabric";
 import { useCanvas } from "@/contexts/CanvasContext";
 import { imagekitTransformations } from "@/lib/imagekit";
-import { fa } from "zod/v4/locales";
 
 export const useFabricCanvas = ({ canvasId, canvasData }: any) => {
   const { setSelectedObject, setCanvasActions } = useCanvas();
@@ -108,7 +107,7 @@ export const useFabricCanvas = ({ canvasId, canvasData }: any) => {
                   scaleY: scaleY,
                 });
 
-                // ✅ FIX: Relative Clipping (Moves with the image)
+                //  FIX: Relative Clipping (Moves with the image)
                 if (clipPath) {
                   const enlivenedClipArr = await fabric.util.enlivenObjects([
                     clipPath,
@@ -172,13 +171,13 @@ export const useFabricCanvas = ({ canvasId, canvasData }: any) => {
       console.log(
         `✅ Canvas loaded: ${c.getObjects().length} valid objects (${
           objects.length - c.getObjects().length
-        } skipped)`
+        } skipped)`,
       );
 
       // Recalculate container scale after layout is ready
       setTimeout(() => calculateScale(), 150);
     },
-    [calculateScale]
+    [calculateScale],
   );
   // ---------------------------------------------------------
   // SAVE CANVAS
@@ -342,7 +341,7 @@ export const useFabricCanvas = ({ canvasId, canvasData }: any) => {
         c.centerObject(img);
         c.setActiveObject(img);
         c.renderAll();
-      }
+      },
     );
   }, []);
 
@@ -399,7 +398,7 @@ export const useFabricCanvas = ({ canvasId, canvasData }: any) => {
         setSelectedObject(newImg);
       });
     },
-    [setSelectedObject]
+    [setSelectedObject],
   );
 
   const changeBackground = useCallback((value: any) => {
@@ -442,7 +441,7 @@ export const useFabricCanvas = ({ canvasId, canvasData }: any) => {
         setSelectedObject(active);
       }
     },
-    [setSelectedObject]
+    [setSelectedObject],
   );
 
   const duplicateSelected = useCallback(() => {
