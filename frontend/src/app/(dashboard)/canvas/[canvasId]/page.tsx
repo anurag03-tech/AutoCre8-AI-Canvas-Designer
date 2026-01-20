@@ -51,15 +51,16 @@ const CanvasPage = () => {
   const canvasHeight = canvas.canvasData.height;
 
   return (
-    <div className="flex-1 flex flex-col h-full overflow-hidden ">
-      {/* Main Container: Measures available space */}
+    <div className="flex-1 flex flex-col h-full">
+      {/* Main Container: Centers canvas */}
       <div
         ref={containerRef}
-        className="flex-1 flex items-center justify-center overflow-hidden relative p-8"
+        className="flex-1 flex items-center justify-center p-8"
+        style={{ overflow: "hidden" }}
       >
         <div
           className={`
-            bg-white shadow-2xl relative
+            bg-white shadow-2xl
             ${
               isPreviewMode
                 ? "border-4 border-purple-600"
@@ -73,7 +74,7 @@ const CanvasPage = () => {
             transformOrigin: "center center",
           }}
         >
-          {/* FABRIC CANVAS - No transform here, just display control */}
+          {/* FABRIC CANVAS */}
           <div
             style={{
               display: isPreviewMode ? "none" : "block",
@@ -102,7 +103,7 @@ const CanvasPage = () => {
       </div>
 
       {/* FOOTER STATUS BAR */}
-      <div className="bg-white border-t px-4 py-2 flex items-center justify-between text-xs text-gray-600">
+      <div className="bg-white border-t px-4 py-2 flex items-center justify-between text-xs text-gray-600 flex-shrink-0">
         <div className="flex gap-4">
           <span>
             <strong>Dimensions:</strong> {canvasWidth} × {canvasHeight}px
