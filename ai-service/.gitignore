@@ -8,3 +8,9 @@ venv/
 .idea/
 *.log
 .DS_Store
+
+.env
+*.json                           # ← Block ALL JSON files
+service-account*.json            # ← Specifically block service account
+*credentials*.json               # ← Block any credentials
+agriai-*.json                    # ← Block your specific file
